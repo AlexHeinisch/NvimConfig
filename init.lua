@@ -827,7 +827,9 @@ require('lazy').setup({
       statusline.section_location = function()
         return '%2l:%-2v'
       end
-
+      require('mini.indentscope').setup()
+      require('mini.surround').setup()
+      require('mini.starter').setup()
       -- ... and there is more!
       --  Check out: https://github.com/echasnovski/mini.nvim
     end,
