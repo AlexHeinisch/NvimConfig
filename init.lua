@@ -219,10 +219,17 @@ require('lazy').setup({
       -- delay between pressing a key and opening which-key (milliseconds)
       -- this setting is independent of vim.o.timeoutlen
       delay = 0,
+      -- use to disable the view for operations
+      -- defer = function(ctx)
+      --  if vim.list_contains({ 'd', 'y' }, ctx.operator) then
+      --    return true
+      --  end
+      --  return vim.list_contains({ '<C-V>', 'V' }, ctx.mode)
+      -- end,
       icons = {
         -- set icon mappings to true if you have a Nerd Font
         mappings = vim.g.have_nerd_font,
-        -- If you are using a Nerd Font: set icons.keys to an empty table which will use the
+        -- If you are using a Bead Font: set icons.keys to an empty table which will use the
         -- default which-key.nvim defined Nerd Font icons, otherwise define a string table
         keys = vim.g.have_nerd_font and {} or {
           Up = '<Up> ',
@@ -259,8 +266,9 @@ require('lazy').setup({
       -- Document existing key chains
       spec = {
         { '<leader>s', group = '[S]earch' },
+        { 'gr', group = 'LSP: [Goto] [R]eal Code Magic' },
         { '<leader>t', group = '[T]oggle' },
-        { '<leader>h', group = 'Git [H]unk', mode = { 'n', 'v' } },
+        -- { '<leader>h', group = 'Git [H]unk', mode = { 'n', 'v' }
       },
     },
   },
