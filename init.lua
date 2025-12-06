@@ -268,7 +268,7 @@ require('lazy').setup({
         { '<leader>s', group = '[S]earch' },
         { '<leader>g', group = 'LSP: [G]eneral LSP Commands' },
         { '<leader>t', group = '[T]oggle' },
-        { '<leader>h', group = 'Git [H]unk', mode = { 'n', 'v' }},
+        { '<leader>h', group = 'Git [H]unk', mode = { 'n', 'v' } },
         { '<leader>c', group = '[C]ode Specific Commands' },
       },
     },
@@ -398,7 +398,7 @@ require('lazy').setup({
       },
     },
   },
-  {'mfussenegger/nvim-jdtls'},
+  { 'mfussenegger/nvim-jdtls' },
   {
     -- Main LSP Configuration
     'neovim/nvim-lspconfig',
@@ -635,8 +635,8 @@ require('lazy').setup({
         automatic_installation = false,
         automatic_enable = {
           exclude = {
-            "jdtls"
-          }
+            'jdtls',
+          },
         },
         handlers = {
           function(server_name)
@@ -670,6 +670,7 @@ require('lazy').setup({
       notify_on_error = false,
       formatters_by_ft = {
         lua = { 'stylua' },
+        java = { 'google-java-format' },
         -- Conform can also run multiple formatters sequentially
         -- python = { "isort", "black" },
         --
