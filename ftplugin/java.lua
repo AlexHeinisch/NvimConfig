@@ -9,6 +9,9 @@ if not status then
 end
 local extendedClientCapabilities = jdtls.extendedClientCapabilities
 
+local root_markers = { '.git', 'mvnw', 'gradlew', 'pom.xml', 'build.gradle' }
+local root_dir = require('jdtls.setup').find_root(root_markers)
+
 local config = {
   cmd = {
     'java',
@@ -32,6 +35,7 @@ local config = {
     workspace_dir,
   },
   root_dir = vim.fn.getcwd(),
+  -- root_dir = root_dir,
 
   settings = {
     java = {
