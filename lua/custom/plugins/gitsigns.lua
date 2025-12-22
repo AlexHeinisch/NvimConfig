@@ -12,9 +12,9 @@ return { -- Adds git related signs to the gutter, as well as utilities for manag
   },
   keys = {
     -- Toggle inline blame (virtual text at end of line)
-    { '<leader>hb', '<cmd>Gitsigns toggle_current_line_blame<cr>', desc = 'Toggle Blame Line' },
+    --{ '<leader>hb', '<cmd>Gitsigns toggle_current_line_blame<cr>', desc = 'Toggle Blame Line' },
 
     -- Or open full blame window (fugitive-style)
-    { '<leader>hB', '<cmd>Gitsigns blame<cr>', desc = 'Blame Buffer' },
+    --{ '<leader>hB', '<cmd>Gitsigns blame<cr>', desc = 'Blame Buffer' },
   }
 }
