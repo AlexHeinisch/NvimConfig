@@ -163,8 +163,10 @@ require('lazy').setup({
 
   'NMAC427/guess-indent.nvim', -- Detect tabstop and shiftwidth automatically
 
-  -- Git Signs
+  -- Git
   require 'custom.plugins.gitsigns',
+  require 'custom.plugins.neogit',
+  require 'custom.plugins.diffview',
 
   -- Key Helper bar on bottom
   require 'custom.plugins.which-key',
@@ -181,6 +183,7 @@ require('lazy').setup({
 
   -- Theme
   require 'custom.plugins.tokyonight',
+  -- require 'custom.plugins.catppuccin',
 
   -- QOL
   require 'custom.plugins.todo-comments',
