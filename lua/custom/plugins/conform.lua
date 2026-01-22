@@ -16,7 +16,7 @@ return { -- Autoformat
       notify_on_error = false,
       formatters_by_ft = {
         lua = { 'stylua' },
-        java = { 'google-java-format' },
+        java = { lsp_format = 'prefer' },
         -- Conform can also run multiple formatters sequentially
         -- python = { "isort", "black" },
         --
