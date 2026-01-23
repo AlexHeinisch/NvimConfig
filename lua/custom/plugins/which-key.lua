@@ -56,6 +56,7 @@ return { -- Useful plugin to show you pending keybinds.
         { '<leader>t', group = '[T]oggle' },
         { '<leader>h', group = 'Git [H]unk', mode = { 'n', 'v' } },
         { '<leader>c', group = '[C]ode Specific Commands' },
+        { '<leader>d', group = '[D]ebug and Test' },
       },
     },
 }

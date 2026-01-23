@@ -10,7 +10,23 @@ return {
       'WhoIsSethDaniel/mason-tool-installer.nvim',
 
       -- Useful status updates for LSP.
-      { 'j-hui/fidget.nvim', opts = {} },
+      {
+        'j-hui/fidget.nvim',
+        opts = {
+          notification = {
+            window = {
+              normal_hl = 'Normal', -- Use Normal highlight group (respects transparent background)
+              winblend = 0, -- No blending, fully transparent background
+            },
+          },
+        },
+        config = function(_, opts)
+          require('fidget').setup(opts)
+          -- Override fidget highlights to use transparent background
+          vim.api.nvim_set_hl(0, 'FidgetTitle', { link = 'Normal' })
+          vim.api.nvim_set_hl(0, 'FidgetTask', { link = 'Normal' })
+        end,
+      },
 
       -- Allows extra capabilities provided by blink.cmp
       'saghen/blink.cmp',

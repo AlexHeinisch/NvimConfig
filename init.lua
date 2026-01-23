@@ -198,6 +198,9 @@ require('lazy').setup({
   -- Treesitter
   require 'custom.plugins.nvim-treesitter',
 
+  -- Debugging
+  require 'kickstart.plugins.debug',
+
   require 'kickstart.plugins.neo-tree',
 
   -- NOTE: The import below can automatically add your own plugins, configuration, etc from `lua/custom/plugins/*.lua`
