@@ -53,6 +53,7 @@ return { -- Useful plugin to show you pending keybinds.
       spec = {
         { '<leader>s', group = '[S]earch' },
         { '<leader>g', group = 'LSP: [G]eneral LSP Commands' },
+        { '<leader>v', group = '[V]ersion Control' },
         { '<leader>t', group = '[T]oggle' },
         { '<leader>h', group = 'Git [H]unk', mode = { 'n', 'v' } },
         { '<leader>c', group = '[C]ode Specific Commands' },
