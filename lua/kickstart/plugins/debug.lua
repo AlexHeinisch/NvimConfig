@@ -134,9 +134,75 @@ return {
       vim.fn.sign_define(tp, { text = icon, texthl = hl, numhl = hl })
     end
 
-    dap.listeners.after.event_initialized['dapui_config'] = dapui.open
-    dap.listeners.before.event_terminated['dapui_config'] = dapui.close
-    dap.listeners.before.event_exited['dapui_config'] = dapui.close
+    local _test_output = {}
+    local _test_exit_code = nil
+    local _summary_shown = false
+
+    local function show_test_summary()
+      if _summary_shown then return end
+      _summary_shown = true
+
+      local passed, failed, errors, skipped = 0, 0, 0, 0
+      local found = false
+      for _, line in ipairs(_test_output) do
+        local r, f, e, s = line:match('Tests run: (%d+), Failures: (%d+), Errors: (%d+), Skipped: (%d+)')
+        if r then
+          passed = passed + tonumber(r) - tonumber(f) - tonumber(e)
+          failed = failed + tonumber(f)
+          errors = errors + tonumber(e)
+          skipped = skipped + tonumber(s)
+          found = true
+        end
+      end
+
+      local msg, hl
+      if found then
+        local parts = { ('%d passed'):format(passed) }
+        if failed > 0 then parts[#parts + 1] = ('%d failed'):format(failed) end
+        if errors > 0 then parts[#parts + 1] = ('%d errors'):format(errors) end
+        if skipped > 0 then parts[#parts + 1] = ('%d skipped'):format(skipped) end
+        msg = 'Tests: ' .. table.concat(parts, ', ')
+        hl = (failed + errors > 0) and 'DiagnosticError' or 'DiagnosticOk'
+      elseif _test_exit_code ~= nil then
+        if _test_exit_code == 0 then
+          msg, hl = 'Tests passed', 'DiagnosticOk'
+        else
+          msg, hl = 'Tests failed (exit ' .. _test_exit_code .. ')', 'DiagnosticError'
+        end
+      end
+
+      if msg then
+        vim.schedule(function()
+          vim.api.nvim_echo({ { msg, hl } }, false, {})
+        end)
+      end
+    end
+
+    dap.listeners.after.event_initialized['dapui_config'] = function()
+      _test_output = {}
+      _test_exit_code = nil
+      _summary_shown = false
+      dapui.open()
+    end
+
+    dap.listeners.before.event_output['java_test_summary'] = function(_, body)
+      for line in (body.output or ''):gmatch('[^\n]+') do
+        _test_output[#_test_output + 1] = line
+      end
+    end
+
+    dap.listeners.after.event_exited['java_test_summary'] = function(_, body)
+      _test_exit_code = body.exitCode
+    end
+
+    dap.listeners.before.event_terminated['dapui_config'] = function()
+      dapui.close()
+      vim.defer_fn(show_test_summary, 50)
+    end
+    dap.listeners.before.event_exited['dapui_config'] = function()
+      dapui.close()
+      vim.defer_fn(show_test_summary, 50)
+    end
 
     -- Install golang specific config
     require('dap-go').setup {
