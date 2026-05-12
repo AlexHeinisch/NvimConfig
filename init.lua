@@ -207,6 +207,9 @@ require('lazy').setup({
   -- Debugging
   require 'kickstart.plugins.debug',
 
+  -- Diagnostics panel
+  require 'custom.plugins.trouble',
+
   -- Navigation
   require 'kickstart.plugins.neo-tree',
 
