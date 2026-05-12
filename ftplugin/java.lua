@@ -39,8 +39,17 @@ local function get_jdtls_paths()
     '\n'
   )
 
-  if java_test_bundle[1] ~= '' then
-    vim.list_extend(path.bundles, java_test_bundle)
+  -- jacocoagent.jar and the runner fat-jar are not OSGi bundles and cause
+  -- "Failed to get bundleInfo" errors when jdtls tries to load them.
+  local excluded_jars = {
+    'com.microsoft.java.test.runner-jar-with-dependencies.jar',
+    'jacocoagent.jar',
+  }
+  for _, jar in ipairs(java_test_bundle) do
+    local fname = vim.fn.fnamemodify(jar, ':t')
+    if jar ~= '' and not vim.tbl_contains(excluded_jars, fname) then
+      table.insert(path.bundles, jar)
+    end
   end
 
   ---
@@ -145,6 +154,8 @@ local cmd = {
 
   '-data',
   data_dir,
+
+  '-clean',
 }
 
 local lsp_settings = {
@@ -203,13 +214,10 @@ local lsp_settings = {
 }
 
 local function on_attach(client, bufnr)
-  -- Enable debugger if configured
   if features.debugger then
     enable_debugger(bufnr)
   end
 
-  -- Java-specific keymaps (keeping your leader-based style)
-  local opts = { buffer = bufnr }
   vim.keymap.set('n', '<leader>co', "<cmd>lua require('jdtls').organize_imports()<cr>", { buffer = bufnr, desc = 'Organize Imports' })
   vim.keymap.set('n', '<leader>crv', "<cmd>lua require('jdtls').extract_variable()<cr>", { buffer = bufnr, desc = 'Extract Variable' })
   vim.keymap.set('v', '<leader>crv', "<esc><cmd>lua require('jdtls').extract_variable(true)<cr>", { buffer = bufnr, desc = 'Extract Variable' })
@@ -232,5 +240,12 @@ jdtls.start_or_attach({
   init_options = {
     bundles = path.bundles,
     extendedClientCapabilities = jdtls.extendedClientCapabilities,
+  },
+  -- jdtls sends this after project init to let the client supply the bundle
+  -- list for dynamic reload (needed for java-test to register its LSP commands).
+  commands = {
+    ['_java.reloadBundles.command'] = function()
+      return path.bundles
+    end,
   },
 })
