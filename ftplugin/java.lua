@@ -4,6 +4,23 @@ local features = {
   debugger = true,
 }
 
+local function find_java_formatter()
+  local candidates = {
+    vim.fn.getcwd() .. '/.formatter.xml',
+    vim.fn.getcwd() .. '/formatter.xml',
+  }
+  for _, p in ipairs(candidates) do
+    if vim.fn.filereadable(p) == 1 then
+      return p
+    end
+  end
+  local global = vim.fn.expand('~/.config/nvim/java-formatter.xml')
+  if vim.fn.filereadable(global) == 1 then
+    return global
+  end
+  return nil
+end
+
 local function get_jdtls_paths()
   if cache_vars.paths then
     return cache_vars.paths
@@ -113,6 +130,7 @@ end
 
 local path = get_jdtls_paths()
 local data_dir = path.data_dir .. '/' .. vim.fn.fnamemodify(vim.fn.getcwd(), ':p:h:t')
+local java_formatter_url = find_java_formatter()
 
 if cache_vars.capabilities == nil then
   jdtls.extendedClientCapabilities.resolveAdditionalTextEditsSupport = true
@@ -180,6 +198,7 @@ local lsp_settings = {
     },
     format = {
       enabled = true,
+      settings = java_formatter_url and { url = java_formatter_url } or nil,
     },
     signatureHelp = {
       enabled = true,
