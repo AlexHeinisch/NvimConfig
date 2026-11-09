@@ -25,6 +25,14 @@ return { -- Highlight, edit, and navigate code
       'vim',
       'vimdoc',
       'java',
+      -- Java project files: Maven/Spring config, Gradle, SQL
+      'xml',
+      'yaml',
+      'json',
+      'properties',
+      'groovy',
+      'kotlin',
+      'sql',
     }
 
     -- Languages that still need vim regex highlighting / have bad TS indent.

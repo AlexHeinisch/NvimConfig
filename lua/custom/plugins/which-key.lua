@@ -52,6 +52,7 @@ return { -- Useful plugin to show you pending keybinds.
       -- Document existing key chains
       spec = {
         { '<leader>s', group = '[S]earch' },
+        { '<leader>a', group = '[A]gent (kitty)', mode = { 'n', 'x' } },
         { '<leader>g', group = 'LSP: [G]eneral LSP Commands' },
         { '<leader>v', group = '[V]ersion Control' },
         { '<leader>t', group = '[T]oggle' },

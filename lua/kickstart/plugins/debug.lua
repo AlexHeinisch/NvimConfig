@@ -2,9 +2,7 @@
 --
 -- Shows how to use the DAP plugin to debug your code.
 --
--- Primarily focused on configuring the debugger for Go, but can
--- be extended to other languages as well. That's why it's called
--- kickstart.nvim and not kitchen-sink.nvim ;)
+-- Configured for Java (java-debug-adapter / java-test via mason, intellij-lsp run configs).
 
 return {
   -- NOTE: Yes, you can install new plugins here!
@@ -20,9 +18,6 @@ return {
     -- Installs the debug adapters for you
     'mason-org/mason.nvim',
     'jay-babu/mason-nvim-dap.nvim',
-
-    -- Add your own debuggers here
-    'leoluz/nvim-dap-go',
 
     -- Show variable values inline while debugging
     'theHamsta/nvim-dap-virtual-text',
@@ -101,7 +96,6 @@ return {
       -- online, please don't ask me how to install them :)
       ensure_installed = {
         -- Update this to ensure that you have the debuggers for the langs you want
-        'delve',
         'java-test',
         'java-debug-adapter',
       },
@@ -210,14 +204,5 @@ return {
       dapui.close()
       vim.defer_fn(show_test_summary, 50)
     end
-
-    -- Install golang specific config
-    require('dap-go').setup {
-      delve = {
-        -- On Windows delve must be run attached or it crashes.
-        -- See https://github.com/leoluz/nvim-dap-go/blob/main/README.md#configuring
-        detached = vim.fn.has 'win32' == 0,
-      },
-    }
   end,
 }

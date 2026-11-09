@@ -7,6 +7,12 @@ vim.g.maplocalleader = ' '
 -- Set to true if you have a Nerd Font installed and selected in the terminal
 vim.g.have_nerd_font = true
 
+-- Track keymap usage (:KeymapReport). Must run before any keymap or plugin is defined.
+require('custom.utils.keymap-stats').setup()
+
+-- Java/Kotlin language server: 'intellij' (headless intellij-server, needs Ultimate) or 'jdtls'
+vim.g.java_lsp = 'intellij'
+
 -- [[ Setting options ]]
 -- See `:help vim.o`
 -- NOTE: You can change these options as you wish!
@@ -69,6 +75,9 @@ vim.opt.listchars = { tab = '» ', trail = '·', nbsp = '␣' }
 -- Preview substitutions live, as you type!
 vim.o.inccommand = 'split'
 
+-- Default border for floating windows (LSP hover, signature help, diagnostics, ...)
+vim.o.winborder = 'rounded'
+
 -- Show which line your cursor is on
 vim.o.cursorline = true
 
@@ -93,9 +102,6 @@ vim.o.expandtab = true -- Convert tabs to spaces
 --  See `:help hlsearch`
 vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
 
--- Diagnostic keymaps
-vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
-
 -- Exit terminal mode in the builtin terminal with a shortcut that is a bit easier
 -- for people to discover. Otherwise, you normally need to press <C-\><C-n>, which
 -- is not what someone will guess without a bit more experience.
@@ -110,20 +116,11 @@ vim.keymap.set('n', '<right>', '<cmd>echo "Use l to move!!"<CR>')
 vim.keymap.set('n', '<up>', '<cmd>echo "Use k to move!!"<CR>')
 vim.keymap.set('n', '<down>', '<cmd>echo "Use j to move!!"<CR>')
 
--- Keybinds to make split navigation easier.
---  Use CTRL+<hjkl> to switch between windows
---
---  See `:help wincmd` for a list of all window commands
-vim.keymap.set('n', '<C-h>', '<C-w><C-h>', { desc = 'Move focus to the left window' })
-vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right window' })
-vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
-vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
+-- Window navigation (<C-hjkl>, also across kitty windows) and resizing (<A-hjkl>)
+-- live in lua/custom/plugins/smart-splits.lua.
 
--- NOTE: Some terminals have colliding keymaps or are not able to send distinct keycodes
--- vim.keymap.set("n", "<C-S-h>", "<C-w>H", { desc = "Move window to the left" })
--- vim.keymap.set("n", "<C-S-l>", "<C-w>L", { desc = "Move window to the right" })
--- vim.keymap.set("n", "<C-S-j>", "<C-w>J", { desc = "Move window to the lower" })
--- vim.keymap.set("n", "<C-S-k>", "<C-w>K", { desc = "Move window to the upper" })
+-- Send file / selection references to the coding agent in another kitty window (<leader>a...)
+require('custom.utils.kitty-agent').setup()
 
 -- [[ Basic Autocommands ]]
 --  See `:help lua-guide-autocommands`
@@ -136,6 +133,25 @@ vim.api.nvim_create_autocmd('TextYankPost', {
   group = vim.api.nvim_create_augroup('kickstart-highlight-yank', { clear = true }),
   callback = function()
     vim.hl.on_yank()
+  end,
+})
+
+-- Reload buffers that were changed on disk (e.g. by a coding agent). 'autoread' alone
+-- only reloads when Neovim happens to check, so trigger the check explicitly.
+vim.api.nvim_create_autocmd({ 'FocusGained', 'BufEnter', 'CursorHold', 'CursorHoldI', 'TermLeave' }, {
+  desc = 'Reload files changed outside of Neovim',
+  group = vim.api.nvim_create_augroup('custom-autoread', { clear = true }),
+  callback = function()
+    if vim.fn.mode() ~= 'c' and vim.fn.getcmdwintype() == '' then
+      vim.cmd 'checktime'
+    end
+  end,
+})
+vim.api.nvim_create_autocmd('FileChangedShellPost', {
+  desc = 'Notify when a file was reloaded from disk',
+  group = 'custom-autoread',
+  callback = function(args)
+    vim.notify('Reloaded ' .. vim.fn.fnamemodify(args.file, ':.') .. ' (changed on disk)', vim.log.levels.INFO)
   end,
 })
 
@@ -189,6 +205,7 @@ require('lazy').setup({
   -- LSP Plugins
   require 'custom.plugins.lazydev',
   require 'custom.plugins.nvim-jdtls',
+  require 'custom.plugins.intellij-lsp',
   require 'custom.plugins.nvim-lspconfig',
   require 'custom.plugins.conform',
   require 'custom.plugins.blink',
@@ -203,6 +220,8 @@ require('lazy').setup({
 
   -- Treesitter
   require 'custom.plugins.nvim-treesitter',
+  require 'custom.plugins.treesitter-textobjects',
+  require 'custom.plugins.treesitter-context',
 
   -- Debugging
   require 'kickstart.plugins.debug',
@@ -212,17 +231,10 @@ require('lazy').setup({
 
   -- Navigation
   require 'kickstart.plugins.neo-tree',
+  require 'custom.plugins.smart-splits',
 
-  -- NOTE: The import below can automatically add your own plugins, configuration, etc from `lua/custom/plugins/*.lua`
-  --    This is the easiest way to modularize your config.
-  --
-  --  Uncomment the following line and add your plugins to `lua/custom/plugins/*.lua` to get going.
-  -- { import = 'custom.plugins' },
-  --
-  -- For additional information with loading, sourcing and examples see `:help lazy.nvim-🔌-plugin-spec`
-  -- Or use telescope!
-  -- In normal mode type `<space>sh` then write `lazy.nvim-plugin`
-  -- you can continue same window with `<space>sr` which resumes last telescope search
+  -- Habits: hints for inefficient motions (`:Hardtime report`)
+  require 'custom.plugins.hardtime',
 }, {
   ui = {
     -- If you are using a Nerd Font: set icons to an empty table which will use the

@@ -1,3 +1,8 @@
+-- intellij-lsp.nvim handles Java when selected in init.lua
+if vim.g.java_lsp == 'intellij' then
+  return
+end
+
 local cache_vars = {}
 
 local features = {
