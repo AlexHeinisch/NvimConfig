@@ -237,12 +237,6 @@ local function on_attach(client, bufnr)
     enable_debugger(bufnr)
   end
 
-  vim.keymap.set('n', '<leader>co', "<cmd>lua require('jdtls').organize_imports()<cr>", { buffer = bufnr, desc = 'Organize Imports' })
-  vim.keymap.set('n', '<leader>crv', "<cmd>lua require('jdtls').extract_variable()<cr>", { buffer = bufnr, desc = 'Extract Variable' })
-  vim.keymap.set('v', '<leader>crv', "<esc><cmd>lua require('jdtls').extract_variable(true)<cr>", { buffer = bufnr, desc = 'Extract Variable' })
-  vim.keymap.set('n', '<leader>crc', "<cmd>lua require('jdtls').extract_constant()<cr>", { buffer = bufnr, desc = 'Extract Constant' })
-  vim.keymap.set('v', '<leader>crc', "<esc><cmd>lua require('jdtls').extract_constant(true)<cr>", { buffer = bufnr, desc = 'Extract Constant' })
-  vim.keymap.set('v', '<leader>crm', "<esc><cmd>lua require('jdtls').extract_method(true)<cr>", { buffer = bufnr, desc = 'Extract Method' })
 end
 
 -- This starts a new client & server,
