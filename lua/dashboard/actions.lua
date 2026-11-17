@@ -62,16 +62,17 @@ local function float(title, lines)
   end
 end
 
-function M.open_lazy()
-  vim.cmd 'Lazy'
+--- Fetches and shows vim.pack's review buffer (`:write` applies, `:quit` discards).
+function M.open_updates()
+  vim.pack.update()
 end
 
 function M.show_intellij_log()
-  local plugin = require('lazy.core.config').plugins['intellij-lsp.nvim']
+  local plugin = vim.pack.get({ 'intellij-lsp.nvim' }, { info = false })[1]
   if not plugin then
     return
   end
-  vim.system({ 'git', '-C', plugin.dir, 'log', '--date=short', '--format=%h  %cd  %s%n%b', 'HEAD..origin/HEAD' }, { text = true }, function(out)
+  vim.system({ 'git', '-C', plugin.path, 'log', '--date=short', '--format=%h  %cd  %s%n%b', 'HEAD..origin/HEAD' }, { text = true }, function(out)
     vim.schedule(function()
       local lines = vim.split(vim.trim(out.stdout or ''), '\n')
       float('intellij-lsp.nvim: new upstream commits', lines)

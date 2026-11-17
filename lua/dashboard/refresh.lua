@@ -1,10 +1,90 @@
--- Background refresh: lazy.nvim updates, Mason updates, latest Neovim release, config smoke test.
+-- Background refresh: plugin updates (git), Mason updates, latest Neovim release, config smoke test.
 -- Results are collected in `result`, then stored in state.data and the cache.
 local state = require 'dashboard.state'
 local M = {}
 
 local function render()
   require('dashboard.render').render()
+end
+
+local function git(path, args, cb)
+  local ok = pcall(vim.system, vim.list_extend({ 'git', '-C', path }, args), { text = true }, function(out)
+    cb(out.code == 0 and vim.trim(out.stdout or '') or nil)
+  end)
+  if not ok then
+    cb(nil)
+  end
+end
+
+--- Newest tag of `tags` (a newline separated `git tag` listing) inside the version range, or nil.
+local function newest_tag_in(range, tags)
+  local best
+  for tag in vim.gsplit(tags, '\n', { trimempty = true }) do
+    local v = vim.version.parse(tag)
+    if v and range:has(v) and (not best or vim.version.gt(v, best.v)) then
+      best = { v = v, tag = tag }
+    end
+  end
+  return best and best.tag
+end
+
+--- Subjects of the commits a plugin is behind its target (`version`: range, branch/tag/hash, or default branch).
+--- @param plugin vim.pack.PlugData
+--- @param cb fun(subjects: string[]|nil) nil when the check failed
+local function commits_behind(plugin, cb)
+  local path, version = plugin.path, plugin.spec.version
+  git(path, { 'fetch', '--quiet', '--tags', '--force', 'origin' }, function(fetched)
+    if not fetched then
+      return cb(nil)
+    end
+    local function log(target)
+      git(path, { 'log', '--format=%s', 'HEAD..' .. target }, function(out)
+        cb(out and vim.split(out, '\n', { trimempty = true }) or nil)
+      end)
+    end
+    if type(version) == 'table' then
+      git(path, { 'tag', '--list' }, function(tags)
+        local tag = tags and newest_tag_in(version, tags)
+        if tag then
+          log(tag)
+        else
+          cb {}
+        end
+      end)
+    elseif type(version) == 'string' then
+      git(path, { 'rev-parse', '--verify', '--quiet', 'origin/' .. version }, function(branch)
+        log(branch and ('origin/' .. version) or version)
+      end)
+    else
+      log 'origin/HEAD'
+    end
+  end)
+end
+
+--- Fetches all plugins in parallel. `cb(names, intellij_commits)`: names of plugins with updates (sorted).
+function M.check_plugins(cb)
+  local plugins = vim.pack.get(nil, { info = false })
+  local pending, names, intellij = #plugins, {}, {}
+  if pending == 0 then
+    return cb(names, intellij)
+  end
+  for _, plugin in ipairs(plugins) do
+    commits_behind(plugin, function(subjects)
+      vim.schedule(function()
+        if subjects and #subjects > 0 then
+          table.insert(names, plugin.spec.name)
+          if plugin.spec.name == 'intellij-lsp.nvim' then
+            intellij = subjects
+          end
+        end
+        pending = pending - 1
+        if pending == 0 then
+          table.sort(names)
+          cb(names, intellij)
+        end
+      end)
+    end)
+  end
 end
 
 function M.refresh()
@@ -28,28 +108,12 @@ function M.refresh()
     end
   end
 
-  -- 1. lazy.nvim: fetch every plugin, list those behind upstream, and the new commits of intellij-lsp.
+  -- 1. Plugins (vim.pack): fetch every plugin and list those behind the revision their `version` points to,
+  --    plus the new commits of intellij-lsp.
   local ok = pcall(function()
-    require('lazy.manage').check({ show = false, clear = false }):wait(function()
-      vim.schedule(function()
-        local names, commits = {}, {}
-        pcall(function()
-          require('lazy.manage.checker').fast_check { report = false }
-          for _, plugin in pairs(require('lazy.core.config').plugins) do
-            local updates = plugin._.updates
-            if updates then
-              table.insert(names, plugin.name)
-              if plugin.name == 'intellij-lsp.nvim' then
-                local out = vim.system({ 'git', '-C', plugin.dir, 'log', '--format=%s', 'HEAD..' .. updates.to.commit }, { text = true }):wait()
-                commits = vim.split(vim.trim(out.stdout or ''), '\n', { trimempty = true })
-              end
-            end
-          end
-        end)
-        table.sort(names)
-        result.plugins, result.intellij = names, commits
-        done()
-      end)
+    M.check_plugins(function(names, commits)
+      result.plugins, result.intellij = names, commits
+      done()
     end)
   end)
   if not ok then

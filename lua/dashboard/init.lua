@@ -1,16 +1,17 @@
 -- Start screen / health dashboard, shown when Neovim starts without arguments.
 --
--- Sections: harpoon marks, plugin updates (lazy.nvim), intellij-lsp commits waiting upstream,
+-- Sections: harpoon marks, plugin updates (vim.pack), intellij-lsp commits waiting upstream,
 -- Mason package updates, and the result of scripts/check.sh. The checks hit the network, so the
 -- screen draws instantly from a cache (stdpath('state')/dashboard.json) and refreshes it in the
 -- background when it is older than REFRESH_AFTER, or when you press `r` on the dashboard.
 -- Buffer-local keys: <CR> runs the action of the line under the cursor (see render), 1-9 open a
--- harpoon file, u opens :Lazy, r refreshes.
+-- harpoon file, u reviews plugin updates, r refreshes.
 --
 -- Modules: state (shared state + cache), logo, render (builds the buffer), refresh (async checks),
 -- actions (what <CR> does). This file owns the window, buffer-local keys and setup().
 local state = require 'dashboard.state'
 local logo = require 'dashboard.logo'
+local actions = require 'dashboard.actions'
 local render = require 'dashboard.render'
 local refresh = require 'dashboard.refresh'
 local M = {}
@@ -70,7 +71,7 @@ local function show()
   end
   map('<CR>', activate)
   map('r', refresh.refresh)
-  map('u', '<Cmd>Lazy<CR>')
+  map('u', actions.open_updates)
 
   -- Lock the cursor to the selectable lines (marks, Mason entries), at the start of their text.
   vim.api.nvim_create_autocmd('CursorMoved', {

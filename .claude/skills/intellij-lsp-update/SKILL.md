@@ -6,12 +6,12 @@ disable-model-invocation: true
 
 # Update intellij-lsp.nvim
 
-The plugin lives in `~/.local/share/nvim/lazy/intellij-lsp.nvim` (detached HEAD, pinned in `lazy-lock.json`). This config bends it in several places, so an update is a *review* first and a `:Lazy update` second.
+The plugin lives in `~/.local/share/nvim/site/pack/core/opt/intellij-lsp.nvim` (detached HEAD, pinned in `nvim-pack-lock.json`, managed by `vim.pack`). This config bends it in several places, so an update is a *review* first and a `vim.pack.update` second.
 
 ## 1. Find the delta
 
 ```sh
-cd ~/.local/share/nvim/lazy/intellij-lsp.nvim
+cd ~/.local/share/nvim/site/pack/core/opt/intellij-lsp.nvim
 git fetch -q
 git log HEAD..origin/HEAD --format='=== %h %cd %s%n%b' --date=short
 git diff HEAD origin/HEAD --stat
@@ -45,7 +45,7 @@ Done when every commit carries my verdict. Neutral commits get one line in the f
 Run the update, then make the config edits we agreed on:
 
 ```sh
-nvim --headless "+Lazy! update intellij-lsp.nvim" +qa
+nvim --headless "+lua vim.pack.update({ 'intellij-lsp.nvim' }, { force = true })" +qa
 ```
 
 Verify with `scripts/check.sh` (headless start, every module loaded, snippet expectations); it ends with `all good`. List the leftovers I have to check by hand in a Java buffer (keymaps, completion, run/debug). Leave committing to me.

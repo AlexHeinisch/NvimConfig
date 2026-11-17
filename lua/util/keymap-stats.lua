@@ -2,7 +2,7 @@
 --
 -- How it works:
 --   * `setup()` wraps `vim.keymap.set` (call it before any plugin loads). Every mapping
---     that has a `desc` gets a counter. That includes lazy.nvim `keys`, LSP on_attach maps
+--     that has a `desc` gets a counter. That includes LSP on_attach maps
 --     and plugin maps defined via vim.keymap.set.
 --   * Keys typed by hand in normal mode are tallied too (`vim.on_key`). Those counts include
 --     keys typed as part of a mapping (e.g. <Space>, s, f for <leader>sf).
@@ -30,8 +30,7 @@ local function mode_str(mode)
 end
 
 local function hit(id, desc)
-  -- lazy.nvim's load-on-key stub and the real mapping fire back to back on the first
-  -- press; count that as one use.
+  -- Count a mapping fired twice back to back (e.g. a wrapper calling another mapping) as one use.
   local now = vim.uv.hrtime()
   if last_hit[id] and now - last_hit[id] < 50e6 then
     return

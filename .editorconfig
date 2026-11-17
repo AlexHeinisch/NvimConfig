@@ -1,0 +1,4 @@
+# Overrides the global ~/.editorconfig (indent_size = 4) for this repo; stylua reads the indent from the buffer.
+[*.lua]
+indent_style = space
+indent_size = 2

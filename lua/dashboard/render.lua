@@ -91,10 +91,10 @@ function M.render()
   else
     local plugins = d.plugins or {}
     if #plugins == 0 then
-      status(true, 'plugins up to date', { key = 'plugins', run = actions.open_lazy })
+      status(true, 'plugins up to date', { key = 'plugins', run = actions.open_updates })
     else
-      status(false, ('%d plugin%s with updates'):format(#plugins, #plugins == 1 and '' or 's'), { key = 'plugins', run = actions.open_lazy })
-      detail(plugins, nil, 'plugins', actions.open_lazy)
+      status(false, ('%d plugin%s with updates'):format(#plugins, #plugins == 1 and '' or 's'), { key = 'plugins', run = actions.open_updates })
+      detail(plugins, nil, 'plugins', actions.open_updates)
     end
 
     local commits = d.intellij or {}
@@ -175,18 +175,12 @@ function M.render()
   add ''
 
   -- Footer
-  local stats = require('lazy').stats()
-  add(('startup %.0f ms · %d/%d plugins loaded'):format(stats.startuptime, stats.loaded, stats.count), 'Comment', {
-    key = 'startup',
-    run = function()
-      vim.cmd 'Lazy profile'
-    end,
-  })
+  add(('init %.0f ms · %d plugins'):format(vim.g.init_ms or 0, #vim.pack.get(nil, { info = false })), 'Comment')
   if d.checked then
     add('checked ' .. ago(d.checked) .. ' · press <CR> to refresh', 'Comment', { key = 'refresh', run = refresh.refresh })
   end
   add ''
-  add('<CR> runs the action of a line · 1-9 open a harpoon file · r refresh · u :Lazy', 'Comment')
+  add('<CR> runs the action of a line · 1-9 open a harpoon file · r refresh · u update plugins', 'Comment')
 
   -- Layout: logo and version centred on top, then the content block; all centred horizontally
   -- and vertically.
