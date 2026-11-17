@@ -241,7 +241,7 @@ return {
         ensure_installed = {}, -- installs go through mason-tool-installer above
         automatic_enable = {
           exclude = {
-            'jdtls', -- started by ftplugin/java.lua (when vim.g.java_lsp == 'jdtls')
+            'jdtls', -- Java/Kotlin is served by intellij-lsp.nvim
           },
         },
       }

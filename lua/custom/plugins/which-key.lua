@@ -53,12 +53,13 @@ return { -- Useful plugin to show you pending keybinds.
       spec = {
         { '<leader>s', group = '[S]earch' },
         { '<leader>a', group = '[A]gent (kitty)', mode = { 'n', 'x' } },
-        { '<leader>g', group = 'LSP: [G]eneral LSP Commands' },
-        { '<leader>v', group = '[V]ersion Control' },
+        { '<leader>l', group = '[L]anguage server control' },
+        { '<leader>g', group = '[G]o to / code actions' },
+        { '<leader>v', group = '[V]ersion control (neogit, diffview)' },
         { '<leader>t', group = '[T]oggle' },
-        { '<leader>h', group = 'Git [H]unk', mode = { 'n', 'v' } },
-{ '<leader>d', group = '[D]ebug and Test' },
-        { '<leader>x', group = '[X] Trouble' },
+        { '<leader>h', group = 'Git [H]unk (gitsigns)', mode = { 'n', 'v' } },
+        { '<leader>d', group = '[D]ebug and test' },
+        { '<leader>x', group = 'Trouble ([X])' },
       },
     },
 }

@@ -10,9 +10,6 @@ vim.g.have_nerd_font = true
 -- Track keymap usage (:KeymapReport). Must run before any keymap or plugin is defined.
 require('custom.utils.keymap-stats').setup()
 
--- Java/Kotlin language server: 'intellij' (headless intellij-server, needs Ultimate) or 'jdtls'
-vim.g.java_lsp = 'intellij'
-
 -- [[ Setting options ]]
 -- See `:help vim.o`
 -- NOTE: You can change these options as you wish!
@@ -136,6 +133,22 @@ vim.api.nvim_create_autocmd('TextYankPost', {
   end,
 })
 
+-- Save modified buffers when focus leaves Neovim or the buffer, so other tools (the Java language
+-- server, build tools) always see the file as it is in the editor. Unnamed, read-only and
+-- special buffers are skipped. FocusLost needs focus events from the terminal (kitty sends them).
+vim.o.autowriteall = true
+vim.api.nvim_create_autocmd({ 'FocusLost', 'BufLeave' }, {
+  desc = 'Autosave modified buffers',
+  group = vim.api.nvim_create_augroup('custom-autosave', { clear = true }),
+  callback = function(event)
+    if event.event == 'FocusLost' then
+      vim.cmd 'silent! wall'
+    elseif vim.bo.modified and vim.bo.buftype == '' and vim.api.nvim_buf_get_name(0) ~= '' then
+      vim.cmd 'silent! update'
+    end
+  end,
+})
+
 -- Reload buffers that were changed on disk (e.g. by a coding agent). 'autoread' alone
 -- only reloads when Neovim happens to check, so trigger the check explicitly.
 vim.api.nvim_create_autocmd({ 'FocusGained', 'BufEnter', 'CursorHold', 'CursorHoldI', 'TermLeave' }, {
@@ -204,7 +217,6 @@ require('lazy').setup({
 
   -- LSP Plugins
   require 'custom.plugins.lazydev',
-  require 'custom.plugins.nvim-jdtls',
   require 'custom.plugins.intellij-lsp',
   require 'custom.plugins.nvim-lspconfig',
   require 'custom.plugins.conform',

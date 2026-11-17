@@ -27,7 +27,14 @@ return { -- Autocompletion
           --   end,
           -- },
         },
-        opts = {},
+        opts = { enable_autosnippets = true },
+        config = function(_, opts)
+          local ls = require 'luasnip'
+          ls.setup(opts)
+          -- Own snippets live in lua/custom/snippets/<filetype>.lua
+          ls.add_snippets('java', require 'custom.snippets.java')
+          ls.add_snippets('kotlin', require 'custom.snippets.kotlin')
+        end,
       },
       'folke/lazydev.nvim',
     },
@@ -71,12 +78,31 @@ return { -- Autocompletion
       completion = {
         -- By default, you may press `<c-space>` to show the documentation.
         -- Optionally, set `auto_show = true` to show the documentation after a delay.
-        documentation = { auto_show = true, auto_show_delay_ms = 500 },
+        documentation = { auto_show = true, auto_show_delay_ms = 500, window = { winblend = 15 } },
+        menu = { winblend = 15 },
       },
 
       sources = {
         default = { 'lsp', 'path', 'snippets', 'lazydev' },
         providers = {
+          lsp = {
+            -- IntelliJ sends empty-string detail/documentation for items without docs. blink opens
+            -- the docs window for any string, so it showed up blank; drop the empty values.
+            transform_items = function(_, items)
+              for _, item in ipairs(items) do
+                if type(item.detail) == 'string' and item.detail:match '^%s*$' then
+                  item.detail = nil
+                end
+                local doc = item.documentation
+                if type(doc) == 'string' and doc:match '^%s*$' then
+                  item.documentation = nil
+                elseif type(doc) == 'table' and (doc.value or ''):match '^%s*$' then
+                  item.documentation = nil
+                end
+              end
+              return items
+            end,
+          },
           lazydev = { module = 'lazydev.integrations.blink', score_offset = 100 },
         },
       },
@@ -89,6 +115,6 @@ return { -- Autocompletion
       fuzzy = { implementation = 'prefer_rust_with_warning' },
 
       -- Shows a signature help window while you type arguments for a function
-      signature = { enabled = true },
+      signature = { enabled = true, window = { winblend = 15 } },
     },
 }
