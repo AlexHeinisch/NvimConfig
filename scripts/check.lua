@@ -34,7 +34,7 @@ local cases = {
   { 'kotlin', 'class Foo<T>(val a: Int, b: String) {}', { '@param T', '@param a', '@param b' } },
 }
 for _, c in ipairs(cases) do
-  local ok, got = pcall(require('custom.snippets.' .. c[1]).tags_for, c[2])
+  local ok, got = pcall(require('snippets.' .. c[1]).tags_for, c[2])
   if not ok then
     fail(('snippet %s %q: %s'):format(c[1], c[2], got))
   elseif not vim.deep_equal(got, c[3]) then
@@ -49,7 +49,7 @@ vim.api.nvim_buf_set_lines(0, 0, -1, false, { '/**', 'void run(int a) {', '}' })
 -- the cursor sits past the last character only in insert mode
 vim.cmd 'startinsert!'
 vim.wait(50)
-local docblock = require 'custom.snippets.docblock'
+local docblock = require 'snippets.docblock'
 if not docblock.expand_on_enter() then
   fail 'expand_on_enter did not expand a lone /**'
 end
@@ -62,6 +62,18 @@ vim.cmd 'startinsert!'
 vim.wait(50)
 if docblock.expand_on_enter() then
   fail 'expand_on_enter expanded a normal line'
+end
+
+-- 5. Formatting (stylua from PATH or Mason; skipped when neither exists).
+local stylua = vim.fn.exepath 'stylua'
+if stylua == '' and vim.uv.fs_stat(vim.fn.stdpath 'data' .. '/mason/bin/stylua') then
+  stylua = vim.fn.stdpath 'data' .. '/mason/bin/stylua'
+end
+if stylua ~= '' then
+  local res = vim.system({ stylua, '--check', '.' }, { cwd = vim.fn.stdpath 'config', text = true }):wait()
+  if res.code ~= 0 then
+    fail('stylua --check failed (run `stylua .`):\n' .. vim.trim((res.stdout or '') .. (res.stderr or '')):sub(1, 600))
+  end
 end
 
 if #failures > 0 then

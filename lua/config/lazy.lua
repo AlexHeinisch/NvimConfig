@@ -12,49 +12,8 @@ require('lazy').setup({
 
   'NMAC427/guess-indent.nvim', -- Detect tabstop and shiftwidth automatically
 
-  -- Git
-  require 'custom.plugins.gitsigns',
-  require 'custom.plugins.neogit',
-  require 'custom.plugins.diffview',
-
-  -- Key helper bar on bottom
-  require 'custom.plugins.which-key',
-
-  -- Telescope
-  require 'custom.plugins.telescope',
-
-  -- LSP
-  require 'custom.plugins.lazydev',
-  require 'custom.plugins.intellij-lsp',
-  require 'custom.plugins.nvim-lspconfig',
-  require 'custom.plugins.conform',
-  require 'custom.plugins.blink',
-
-  -- Theme
-  require 'custom.plugins.tokyonight',
-
-  -- QOL
-  require 'custom.plugins.todo-comments',
-  require 'custom.plugins.mini',
-
-  -- Treesitter
-  require 'custom.plugins.nvim-treesitter',
-  require 'custom.plugins.treesitter-textobjects',
-  require 'custom.plugins.treesitter-context',
-
-  -- Debugging
-  require 'custom.plugins.debug',
-
-  -- Diagnostics panel
-  require 'custom.plugins.trouble',
-
-  -- Navigation
-  require 'custom.plugins.neo-tree',
-  require 'custom.plugins.smart-splits',
-  require 'custom.plugins.harpoon',
-
-  -- Habits: hints for inefficient motions (`:Hardtime report`)
-  require 'custom.plugins.hardtime',
+  -- One spec per plugin in lua/plugins/ (loaded alphabetically; load order is decided by lazy.nvim).
+  { import = 'plugins' },
 }, {
   change_detection = { notify = false },
   performance = {

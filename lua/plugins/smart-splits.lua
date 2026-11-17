@@ -1,5 +1,5 @@
 -- Seamless <C-hjkl> navigation (and <A-hjkl> resizing) across Neovim splits and herdr panes.
--- The Neovim -> herdr direction is the backend in lua/custom/smart_splits_herdr.lua.
+-- The Neovim -> herdr direction is the backend in lua/util/smart_splits_herdr.lua.
 -- The herdr -> Neovim direction is ~/.config/herdr/smart-nav.sh, bound in herdr's config.toml:
 -- it forwards the key to Neovim when Neovim is the focused pane, otherwise moves herdr focus.
 return {
@@ -7,7 +7,7 @@ return {
   version = '^3.0.0',
   lazy = false,
   opts = {
-    mux = { backend = 'custom.smart_splits_herdr' },
+    mux = { backend = 'util.smart_splits_herdr' },
   },
   keys = {
     {

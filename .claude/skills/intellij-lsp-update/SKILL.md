@@ -22,7 +22,7 @@ No commits ahead: say so and stop.
 
 ## 2. Read this config's side of it
 
-Read `lua/custom/plugins/intellij-lsp.lua` and `lua/custom/plugins/blink.lua`: they hold every deviation, with the reason beside it. Read the `REMOVE when` condition at the top of `lua/custom/utils/intellij-lombok-workaround.lua`.
+Read `lua/plugins/intellij-lsp.lua` and `lua/plugins/blink.lua`: they hold every deviation, with the reason beside it. Read the `REMOVE when` condition at the top of `lua/util/intellij-lombok-workaround.lua`.
 
 Tag each commit against that code with exactly one verdict:
 

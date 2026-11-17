@@ -34,7 +34,7 @@ return {
   },
   config = function(_, opts)
     -- debug panel: Locals and Watches above the Call stack
-    require('custom.utils.intellij-debug-layout').apply()
+    require('util.intellij-debug-layout').apply()
     require('intellij-lsp').setup(opts)
 
     vim.api.nvim_create_autocmd('LspAttach', {
@@ -47,8 +47,8 @@ return {
         local buf = event.buf
 
         -- intellij-server ignores lombok.config, so @CustomLog classes get false errors.
-        -- See lua/custom/utils/intellij-lombok-workaround.lua for the cause and when to remove it.
-        require('custom.utils.intellij-lombok-workaround').apply(client)
+        -- See lua/util/intellij-lombok-workaround.lua for the cause and when to remove it.
+        require('util.intellij-lombok-workaround').apply(client)
 
         -- The plugin sets its run/debug maps in on_attach, which runs after LspAttach,
         -- so the overrides are scheduled to land after them.

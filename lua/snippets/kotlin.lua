@@ -1,6 +1,6 @@
 -- KDoc skeleton: <CR> after a lone `/**` expands to a comment with @param / @return filled in
 -- from the function or class below. See docblock.lua.
-local docblock = require 'custom.snippets.docblock'
+local docblock = require 'snippets.docblock'
 local text = docblock.node_text
 
 local function names(list, child_type, src, out, prefix)

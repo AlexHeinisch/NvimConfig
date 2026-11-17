@@ -1,6 +1,5 @@
 return { -- Autocompletion
   'saghen/blink.cmp',
-  event = 'VimEnter',
   version = '1.*',
   dependencies = {
     -- Snippet Engine
@@ -29,7 +28,6 @@ return { -- Autocompletion
       },
       opts = {},
     },
-    'folke/lazydev.nvim',
   },
   --- @module 'blink.cmp'
   --- @type blink.cmp.Config
@@ -59,11 +57,11 @@ return { -- Autocompletion
       preset = 'enter',
 
       -- <CR> accepts the selected item; after a lone `/**` in Java/Kotlin it expands the
-      -- javadoc/KDoc skeleton (lua/custom/snippets); otherwise it is a normal <CR>.
+      -- javadoc/KDoc skeleton (lua/snippets); otherwise it is a normal <CR>.
       ['<CR>'] = {
         'accept',
         function()
-          return require('custom.snippets.docblock').expand_on_enter(true)
+          return require('snippets.docblock').expand_on_enter(true)
         end,
         'fallback',
       },
@@ -86,7 +84,9 @@ return { -- Autocompletion
     },
 
     sources = {
-      default = { 'lsp', 'path', 'snippets', 'lazydev' },
+      default = { 'lsp', 'path', 'snippets' },
+      -- lazydev is loaded by its own spec (ft = 'lua'), so it is only offered in Lua buffers.
+      per_filetype = { lua = { inherit_defaults = true, 'lazydev' } },
       providers = {
         lsp = {
           -- IntelliJ sends empty-string detail/documentation for items without docs. blink opens

@@ -1,7 +1,7 @@
 -- Javadoc skeleton: <CR> after a lone `/**` (above a method, constructor, class, ...)
 -- expands to a comment with @param / @return / @throws filled in from the declaration below,
 -- like IntelliJ's `/**` + Enter (the <CR> hook lives in plugins/blink.lua, logic in docblock.lua).
-local docblock = require 'custom.snippets.docblock'
+local docblock = require 'snippets.docblock'
 local text = docblock.node_text
 
 local function tags(decl, src)

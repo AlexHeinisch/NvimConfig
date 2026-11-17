@@ -22,6 +22,7 @@ local report_file = vim.fn.stdpath 'data' .. '/keymap-report.md'
 local pending = { maps = {}, keys = {} } -- deltas since the last flush
 local known = {} -- id -> desc for every tracked mapping defined this session (written on each flush)
 local last_hit = {}
+local FORGET_AFTER = 60 * 24 * 3600 -- a defined-but-unused mapping not seen in any session for this long is dropped
 local dirty = false
 
 local function mode_str(mode)
@@ -68,8 +69,20 @@ function M.flush()
   data.maps = type(data.maps) == 'table' and data.maps or {}
   data.keys = type(data.keys) == 'table' and data.keys or {}
   data.known = type(data.known) == 'table' and data.known or {}
+  data.seen = type(data.seen) == 'table' and data.seen or {}
+  local now = os.time()
   for id, desc in pairs(known) do
     data.known[id] = desc
+    data.seen[id] = now
+  end
+  -- Buffer-local maps (LSP, gitsigns) only exist in some sessions, so "defined this session" can't
+  -- decide what is stale; "not defined in any session lately" can.
+  for id in pairs(data.known) do
+    if not data.seen[id] then
+      data.seen[id] = now
+    elseif now - data.seen[id] > FORGET_AFTER then
+      data.known[id], data.seen[id] = nil, nil
+    end
   end
   for id, e in pairs(pending.maps) do
     local d = data.maps[id] or { count = 0 }

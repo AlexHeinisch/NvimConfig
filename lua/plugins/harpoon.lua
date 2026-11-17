@@ -7,20 +7,39 @@ return {
   dependencies = { 'nvim-lua/plenary.nvim' },
   config = function()
     local harpoon = require 'harpoon'
-    -- Shortened, icon-prefixed paths in the menu (custom/utils/path-display.lua); buffer text stays the real path.
+    -- Shortened, icon-prefixed paths in the menu (util/path-display.lua); buffer text stays the real path.
     harpoon:extend {
       UI_CREATE = function(cx)
-        require('custom.utils.path-display').attach_harpoon(cx.bufnr, cx.win_id)
+        require('util.path-display').attach_harpoon(cx.bufnr, cx.win_id)
       end,
     }
+    -- harpoon calls `key()` on every `harpoon:list()`, and the statusline does that on every redraw,
+    -- so the (cwd, branch) key is cached and only recomputed after something that can change it.
+    local cached_key
+    local function key()
+      if not cached_key then
+        local cwd = vim.uv.cwd() or ''
+        local ok, res = pcall(function()
+          return vim.system({ 'git', '-C', cwd, 'branch', '--show-current' }, { text = true }):wait()
+        end)
+        local branch = ok and res.code == 0 and vim.trim(res.stdout or '') or ''
+        cached_key = branch ~= '' and (cwd .. '@' .. branch) or cwd
+      end
+      return cached_key
+    end
+    local group = vim.api.nvim_create_augroup('custom-harpoon-key', { clear = true })
+    local function invalidate()
+      cached_key = nil
+    end
+    vim.api.nvim_create_autocmd(
+      { 'DirChanged', 'FocusGained', 'TermClose' },
+      { group = group, callback = invalidate, desc = 'Harpoon key: cwd/branch may have changed' }
+    )
+    vim.api.nvim_create_autocmd('User', { group = group, pattern = 'Neogit*', callback = invalidate, desc = 'Harpoon key: Neogit changed the branch' })
     harpoon:setup {
       settings = {
         save_on_toggle = true, -- edits made in the menu are saved when it closes
-        key = function()
-          local cwd = vim.uv.cwd() or ''
-          local branch = vim.trim(vim.fn.system { 'git', '-C', cwd, 'branch', '--show-current' })
-          return vim.v.shell_error == 0 and branch ~= '' and (cwd .. '@' .. branch) or cwd
-        end,
+        key = key,
       },
     }
   end,

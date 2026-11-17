@@ -13,13 +13,13 @@ return { -- Fuzzy Finder (files, lsp, etc)
     },
     { 'nvim-telescope/telescope-ui-select.nvim' },
 
-    { 'nvim-tree/nvim-web-devicons', enabled = vim.g.have_nerd_font },
+    'nvim-tree/nvim-web-devicons',
   },
   config = function()
     require('telescope').setup {
       defaults = {
         -- Drops src/main/java, elides the middle of long paths, dims dirs: iam/com/…/UserService.java
-        path_display = require('custom.utils.path-display').telescope,
+        path_display = require('util.path-display').telescope,
       },
       extensions = {
         ['ui-select'] = {

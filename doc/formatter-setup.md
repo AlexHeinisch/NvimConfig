@@ -1,7 +1,7 @@
 # Formatter Setup
 
 Formatting is handled by [conform.nvim](https://github.com/stevearc/conform.nvim).
-Java formatting is delegated to jdtls (Eclipse JDT Language Server).
+Java and Kotlin formatting is delegated to the IntelliJ language server (intellij-lsp.nvim).
 
 ## Formatters by filetype
 
@@ -9,10 +9,12 @@ Java formatting is delegated to jdtls (Eclipse JDT Language Server).
 |----------|-----------------|
 | Lua      | `stylua`        |
 | Rust     | `rustfmt`       |
-| Java     | jdtls (LSP)     |
+| Java     | IntelliJ server (LSP, `lsp_format = 'prefer'`) |
 
 Indentation style (tabs vs spaces, width) is auto-detected per buffer by
 `guess-indent.nvim` and passed to `stylua` and `rustfmt` automatically.
+Those indentation flags are passed on the command line, so they override the
+indent settings of any `.stylua.toml`; other keys (`column_width`, `quote_style`, ...) still come from the file.
 
 ---
 
@@ -26,8 +28,8 @@ that does not belong to a project with its own config.
 ### Per-project override
 
 Place a `.stylua.toml` at the **project root**. stylua walks up the directory
-tree and uses the first config it finds, so the project file takes full
-precedence over the global one.
+tree and uses the first config it finds, so the project file replaces the
+global one for every key except the indentation (see above).
 
 ```toml
 # project/.stylua.toml
@@ -60,51 +62,8 @@ hard_tabs = false
 
 ---
 
-## Java — jdtls (Eclipse formatter XML)
+## Java / Kotlin — IntelliJ language server
 
-jdtls applies formatting using an Eclipse formatter profile.
-
-### Global default
-
-A pre-built profile is already present at:
-
-```
-~/.config/nvim/java-formatter.xml   ← iam-style profile
-```
-
-This profile was derived from the `iam` project conventions:
-4-space indent, 160-char line limit, K&R braces, parameters column-aligned
-with the opening parenthesis, each annotation on its own line.
-
-It is loaded automatically whenever no project-local formatter is found.
-
-To create your own, export a formatter profile from Eclipse
-(`Window → Preferences → Java → Code Style → Formatter → Export`) or from
-IntelliJ with the *Eclipse Code Formatter* plugin
-(`Settings → Eclipse Code Formatter → Export`), then replace the file above.
-
-### Per-project override
-
-Place a formatter XML at one of these paths inside the **project root**:
-
-```
-<project-root>/.formatter.xml     ← checked first
-<project-root>/formatter.xml
-```
-
-The jdtls config in `ftplugin/java.lua` checks for these files on startup and
-uses the first one found, falling back to the global default.
-
-> **Note:** jdtls is started once per project (keyed on `cwd`). If you add or
-> change a formatter XML after the server is already running, restart it with
-> `:LspRestart` (or close and reopen Neovim) for the new config to take effect.
-
-### Obtaining a formatter XML
-
-- **Google Java Format style**: use the XML from the
-  [google-java-format](https://github.com/google/google-java-format) project.
-- **Eclipse**: `Window → Preferences → Java → Code Style → Formatter → Export`.
-- **IntelliJ**: install the *Eclipse Code Formatter* plugin and export from
-  `Settings → Eclipse Code Formatter`.
-- **Spring**: the Spring Framework ships `spring-javaformat` which includes an
-  Eclipse XML.
+`<leader>f` asks the `intellij` client to format (`java = { lsp_format = 'prefer' }` in
+`lua/plugins/conform.lua`). The code style comes from the server's own project settings, so
+there is no formatter profile in this config. Formatting is not run on save.

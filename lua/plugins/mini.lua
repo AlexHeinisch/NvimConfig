@@ -5,8 +5,7 @@ return { -- Collection of various small independent plugins/modules
     --  You could remove this setup call if you don't like it,
     --  and try some other statusline plugin
     local statusline = require 'mini.statusline'
-    -- set use_icons to true if you have a Nerd Font
-    statusline.setup { use_icons = vim.g.have_nerd_font }
+    statusline.setup { use_icons = true }
 
     -- Custom location format, plus LSP client names and the harpoon slot of the current file.
     ---@diagnostic disable-next-line: duplicate-set-field

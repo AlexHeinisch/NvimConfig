@@ -34,7 +34,7 @@
 --   are untouched. Known gap that remains: no completion on `log.`.
 --
 -- REMOVE when JetBrains fixes file name matching for file types in intellij-server: delete this
--- file and its call in lua/custom/plugins/intellij-lsp.lua, restart, and check that
+-- file and its call in lua/plugins/intellij-lsp.lua, restart, and check that
 -- RealmAttributeValidatorImpl (iam repo) is clean without it.
 local M = {}
 

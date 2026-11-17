@@ -1,6 +1,6 @@
 -- [[ Basic keymaps ]] See `:help vim.keymap.set()`.
 -- Window navigation (<C-hjkl>, also across herdr panes) and resizing (<A-hjkl>)
--- live in lua/custom/plugins/smart-splits.lua. Arrow-key discipline is handled by hardtime.nvim.
+-- live in lua/plugins/smart-splits.lua. Arrow-key discipline is handled by hardtime.nvim.
 
 -- Clear search highlights on <Esc>
 vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')

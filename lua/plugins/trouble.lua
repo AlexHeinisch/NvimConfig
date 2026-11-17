@@ -17,13 +17,6 @@ return {
       desc = 'Trouble: Workspace Diagnostics',
     },
     {
-      '<leader>xd',
-      function()
-        require('trouble').toggle { mode = 'diagnostics', filter = { buf = 0 } }
-      end,
-      desc = 'Trouble: Document Diagnostics',
-    },
-    {
       '<leader>xt',
       function()
         require('trouble').toggle { mode = 'todo' }

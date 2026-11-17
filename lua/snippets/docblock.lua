@@ -54,7 +54,7 @@ end
 
 M.make = make
 
-local MODULES = { java = 'custom.snippets.java', kotlin = 'custom.snippets.kotlin' }
+local MODULES = { java = 'snippets.java', kotlin = 'snippets.kotlin' }
 
 --- `<CR>` after a lone `/**`: replace it with the doc comment skeleton. Returns true when it
 --- expanded, so a caller can fall through to the normal `<CR>` otherwise (see blink.lua).

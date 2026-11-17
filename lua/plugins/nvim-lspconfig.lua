@@ -41,9 +41,9 @@ return {
         end
         local builtin = require 'telescope.builtin'
 
-        map('<leader>gr', vim.lsp.buf.rename, '[R]e[n]ame')
+        map('<leader>gr', vim.lsp.buf.rename, '[R]ename symbol')
         map('<leader>ga', vim.lsp.buf.code_action, '[G]oto Code [A]ction', { 'n', 'x' })
-        map('<leader>gu', builtin.lsp_references, '[G]oto [R]eferences')
+        map('<leader>gu', builtin.lsp_references, '[G]oto Usages (references)')
         map('<leader>gi', builtin.lsp_implementations, '[G]oto [I]mplementation')
         map('<leader>gd', builtin.lsp_definitions, '[G]oto [D]efinition') -- jump back with <C-t>
         map('<leader>gO', builtin.lsp_document_symbols, 'Open Document Symbols')
@@ -88,8 +88,11 @@ return {
     vim.api.nvim_create_autocmd('LspDetach', {
       group = vim.api.nvim_create_augroup('custom-lsp-detach', { clear = true }),
       callback = function(event)
-        if #vim.lsp.get_clients { bufnr = event.buf } > 1 then
-          return -- other clients still attached; keep the highlight autocmds
+        -- The detaching client is still listed while LspDetach runs, so exclude it by id.
+        for _, c in ipairs(vim.lsp.get_clients { bufnr = event.buf }) do
+          if c.id ~= event.data.client_id then
+            return -- another client is still attached; keep the highlight autocmds
+          end
         end
         vim.lsp.buf.clear_references()
         pcall(vim.api.nvim_del_augroup_by_name, 'custom-lsp-highlight-' .. event.buf)
@@ -101,45 +104,40 @@ return {
       severity_sort = true,
       float = { source = 'if_many' },
       underline = { severity = vim.diagnostic.severity.ERROR },
-      signs = vim.g.have_nerd_font and {
+      signs = {
         text = {
           [vim.diagnostic.severity.ERROR] = '󰅚 ',
           [vim.diagnostic.severity.WARN] = '󰀪 ',
           [vim.diagnostic.severity.INFO] = '󰋽 ',
           [vim.diagnostic.severity.HINT] = '󰌶 ',
         },
-      } or {},
+      },
       virtual_text = { source = 'if_many', spacing = 2 },
     }
 
-    -- Servers to install and enable; values are passed to `vim.lsp.config(name, cfg)`.
+    -- Servers to install and enable. Per-server settings, if ever needed, go in
+    -- `vim.lsp.config('<name>', {...})` before the enable call below.
     -- Java/Kotlin are served by intellij-lsp.nvim, so jdtls / kotlin-language-server are not listed.
     local servers = {
-      lua_ls = {},
-      angularls = {},
-      docker_language_server = {}, -- Dockerfile and compose
-      fish_lsp = {},
-      helm_ls = {},
-      htmx = {},
-      lemminx = {}, -- XML
-      ts_ls = {},
+      'lua_ls',
+      'angularls',
+      'docker_language_server', -- Dockerfile and compose
+      'fish_lsp',
+      'helm_ls',
+      'htmx',
+      'lemminx', -- XML
+      'ts_ls',
     }
 
     -- Ensure the servers and tools above are installed (`:Mason` shows the state).
-    local ensure_installed = vim.tbl_keys(servers)
+    local ensure_installed = vim.list_slice(servers)
     vim.list_extend(ensure_installed, {
       'stylua', -- Used to format Lua code
     })
     require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
-    for name, cfg in pairs(servers) do
-      if next(cfg) then
-        vim.lsp.config(name, cfg)
-      end
-    end
-
     -- Only the servers listed above are enabled (anything else installed in Mason stays off).
     require('mason-lspconfig').setup { ensure_installed = {}, automatic_enable = false }
-    vim.lsp.enable(vim.tbl_keys(servers))
+    vim.lsp.enable(servers)
   end,
 }
