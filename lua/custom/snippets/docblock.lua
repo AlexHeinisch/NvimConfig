@@ -1,12 +1,11 @@
--- Shared by java.lua and kotlin.lua: a `/**` autosnippet that expands to a doc comment skeleton
--- with one tag line per thing the declaration below needs documented.
+-- Shared by java.lua and kotlin.lua: pressing <CR> after a lone `/**` expands to a doc comment
+-- skeleton with one tag line per thing the declaration below needs documented.
 --
 -- The open `/**` poisons the buffer's own treesitter parse (everything after it is "comment"), so
 -- the lines below are cut at their first `{` or `;`, closed again, and parsed on their own by the
 -- language module: `tags_for(src) -> string[]` returns lines like '@param a'.
 local ls = require 'luasnip'
 local s, t, i, d, sn = ls.snippet, ls.text_node, ls.insert_node, ls.dynamic_node, ls.snippet_node
-local line_begin = require('luasnip.extras.conditions.expand').line_begin
 
 local M = {}
 
@@ -30,7 +29,7 @@ function M.node_text(node, src)
 end
 
 --- @param tags_for fun(decl_text: string): string[]
-function M.snippet(tags_for)
+local function make(tags_for)
   local function skeleton()
     local row = vim.api.nvim_win_get_cursor(0)[1] - 1
     local ok, list = pcall(function() return tags_for(M.declaration_text(0, row)) end)
@@ -48,10 +47,30 @@ function M.snippet(tags_for)
     return sn(nil, nodes)
   end
 
-  return s({ trig = '/**', snippetType = 'autosnippet', condition = line_begin, show_condition = line_begin }, {
-    t { '/**', '' },
-    d(1, skeleton),
+  return s('/**', { t { '/**', '' }, d(1, skeleton) })
+end
+
+M.make = make
+
+local MODULES = { java = 'custom.snippets.java', kotlin = 'custom.snippets.kotlin' }
+
+--- `<CR>` after a lone `/**`: replace it with the doc comment skeleton. Returns true when it
+--- expanded, so a caller can fall through to the normal `<CR>` otherwise (see blink.lua).
+function M.expand_on_enter()
+  local module = MODULES[vim.bo.filetype]
+  if not module then
+    return false
+  end
+  local row, col = unpack(vim.api.nvim_win_get_cursor(0))
+  local line = vim.api.nvim_get_current_line()
+  if col ~= #line or not line:match '^%s*/%*%*$' then
+    return false
+  end
+  local start = line:find('/%*%*$') - 1
+  ls.snip_expand(make(require(module).tags_for), {
+    clear_region = { from = { row - 1, start }, to = { row - 1, col } },
   })
+  return true
 end
 
 return M

@@ -1,6 +1,6 @@
--- Javadoc skeleton: typing `/**` at the start of a line (above a method, constructor, class, ...)
+-- Javadoc skeleton: <CR> after a lone `/**` (above a method, constructor, class, ...)
 -- expands to a comment with @param / @return / @throws filled in from the declaration below,
--- like IntelliJ's `/**` + Enter. Needs `enable_autosnippets = true` (see plugins/blink.lua).
+-- like IntelliJ's `/**` + Enter (the <CR> hook lives in plugins/blink.lua, logic in docblock.lua).
 local docblock = require 'custom.snippets.docblock'
 local text = docblock.node_text
 
@@ -76,4 +76,4 @@ local function tags_for(decl_text)
   return {}
 end
 
-return { docblock.snippet(tags_for) }
+return { tags_for = tags_for }

@@ -48,4 +48,4 @@ Run the update, then make the config edits we agreed on:
 nvim --headless "+Lazy! update intellij-lsp.nvim" +qa
 ```
 
-Verify with a headless start that loads the edited files without errors. List the leftovers I have to check by hand in a Java buffer (keymaps, completion, run/debug). Leave committing to me.
+Verify with `scripts/check.sh` (headless start, every module loaded, snippet expectations); it ends with `all good`. List the leftovers I have to check by hand in a Java buffer (keymaps, completion, run/debug). Leave committing to me.

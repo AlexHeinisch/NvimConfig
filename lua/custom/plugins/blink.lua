@@ -27,14 +27,7 @@ return { -- Autocompletion
           --   end,
           -- },
         },
-        opts = { enable_autosnippets = true },
-        config = function(_, opts)
-          local ls = require 'luasnip'
-          ls.setup(opts)
-          -- Own snippets live in lua/custom/snippets/<filetype>.lua
-          ls.add_snippets('java', require 'custom.snippets.java')
-          ls.add_snippets('kotlin', require 'custom.snippets.kotlin')
-        end,
+        opts = {},
       },
       'folke/lazydev.nvim',
     },
@@ -64,6 +57,14 @@ return { -- Autocompletion
         --
         -- See :h blink-cmp-config-keymap for defining your own keymap
         preset = 'enter',
+
+        -- <CR> accepts the selected item; after a lone `/**` in Java/Kotlin it expands the
+        -- javadoc/KDoc skeleton (lua/custom/snippets); otherwise it is a normal <CR>.
+        ['<CR>'] = {
+          'accept',
+          function() return require('custom.snippets.docblock').expand_on_enter() end,
+          'fallback',
+        },
 
         -- For more advanced Luasnip keymaps (e.g. selecting choice nodes, expansion) see:
         --    https://github.com/L3MON4D3/LuaSnip?tab=readme-ov-file#keymaps

@@ -1,4 +1,4 @@
--- KDoc skeleton: `/**` at the start of a line expands to a comment with @param / @return filled in
+-- KDoc skeleton: <CR> after a lone `/**` expands to a comment with @param / @return filled in
 -- from the function or class below. See docblock.lua.
 local docblock = require 'custom.snippets.docblock'
 local text = docblock.node_text
@@ -73,4 +73,4 @@ local function tags_for(decl_text)
   return out
 end
 
-return { docblock.snippet(tags_for) }
+return { tags_for = tags_for }
