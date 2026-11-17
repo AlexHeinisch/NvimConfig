@@ -35,3 +35,39 @@ require('which-key').setup {
     end)(),
   },
 }
+
+-- Neovim only honours a buffer-local `nowait` mapping if it comes before longer partial matches in the
+-- buffer's mapping list, and new mappings are inserted at the front. Maps added after which-key's trigger
+-- (LSP attach, gitsigns, IntelliJ) therefore push `<Space>` behind `<leader>g…`/`<leader>h…`, and Neovim
+-- waits the full 'timeoutlen' before the popup opens. Re-adding the triggers moves them back to the front.
+local function refresh_triggers(buf)
+  local Triggers = require 'which-key.triggers'
+  if not vim.api.nvim_buf_is_valid(buf) then
+    return
+  end
+  for id, trigger in pairs(vim.deepcopy(Triggers._triggers)) do
+    if trigger.buf == buf then
+      pcall(vim.keymap.del, trigger.mode, trigger.keys, { buffer = buf })
+      Triggers._triggers[id] = nil
+      Triggers.add(trigger)
+    end
+  end
+end
+
+-- Used by plugins that add buffer-local maps after the buffer was set up (gitsigns' on_attach).
+_G.WhichKeyRefresh = function(buf)
+  vim.schedule(function()
+    refresh_triggers(buf)
+  end)
+end
+
+vim.api.nvim_create_autocmd('LspAttach', {
+  group = vim.api.nvim_create_augroup('which-key-refresh', { clear = true }),
+  desc = 'Keep which-key triggers ahead of buffer-local maps',
+  callback = function(ev)
+    -- later than the attach handlers (IntelliJ and the LSP maps register theirs on LspAttach too)
+    vim.defer_fn(function()
+      refresh_triggers(ev.buf)
+    end, 50)
+  end,
+})

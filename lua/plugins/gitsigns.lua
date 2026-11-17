@@ -60,5 +60,8 @@ require('gitsigns').setup {
 
     -- Inspect
     map('n', '<leader>hp', gs.preview_hunk, { desc = '[P]review hunk' })
+
+    -- keep which-key's <Space> trigger in front of the maps added above (see plugins/which-key.lua)
+    _G.WhichKeyRefresh(bufnr)
   end,
 }
