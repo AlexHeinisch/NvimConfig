@@ -60,6 +60,14 @@ require('gitsigns').setup {
 
     -- Inspect
     map('n', '<leader>hp', gs.preview_hunk, { desc = '[P]review hunk' })
+    map('n', '<leader>hb', function()
+      gs.blame_line { full = true }
+    end, { desc = '[B]lame line (full commit)' })
+    map('n', '<leader>hd', gs.diffthis, { desc = '[D]iff this file against the index' })
+    map('n', '<leader>hq', function()
+      gs.setqflist 'all'
+    end, { desc = 'All hunks to [Q]uickfix' })
+    map('n', '<leader>tb', gs.toggle_current_line_blame, { desc = '[T]oggle inline [B]lame' })
 
     -- keep which-key's <Space> trigger in front of the maps added above (see plugins/which-key.lua)
     _G.WhichKeyRefresh(bufnr)

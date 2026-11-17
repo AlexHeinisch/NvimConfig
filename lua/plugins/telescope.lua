@@ -27,6 +27,11 @@ vim.keymap.set('n', '<leader>sg', builtin.live_grep, { desc = '[S]earch by [G]re
 vim.keymap.set('n', '<leader>sd', builtin.diagnostics, { desc = '[S]earch [D]iagnostics' })
 vim.keymap.set('n', '<leader>sr', builtin.resume, { desc = '[S]earch [R]esume' })
 vim.keymap.set('n', '<leader>s.', builtin.oldfiles, { desc = '[S]earch Recent Files ("." for repeat)' })
+-- Version control: browse, don't edit (commits, rebases and pushes stay on the command line).
+vim.keymap.set('n', '<leader>vs', builtin.git_status, { desc = '[V]CS: [S]tatus (changed files, diff preview)' })
+vim.keymap.set('n', '<leader>vc', builtin.git_commits, { desc = '[V]CS: [C]ommits' })
+vim.keymap.set('n', '<leader>vb', builtin.git_bcommits, { desc = '[V]CS: [B]uffer history (commits of this file)' })
+vim.keymap.set('n', '<leader>vB', builtin.git_branches, { desc = '[V]CS: [B]ranches (checkout)' })
 vim.keymap.set('n', '<leader><leader>', builtin.buffers, { desc = '[ ] Find existing buffers' })
 
 vim.keymap.set('n', '<leader>/', function()

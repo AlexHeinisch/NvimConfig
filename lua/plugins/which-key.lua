@@ -23,6 +23,7 @@ require('which-key').setup {
     { '<leader>h', group = 'Git [H]unk (gitsigns)', mode = { 'n', 'v' } },
     { '<leader>d', group = '[D]ebug and test' },
     { '<leader>x', group = 'Trouble ([X])' },
+    { '<leader>v', group = '[V]ersion control (telescope)' },
 
     -- Harpoon <leader>1..9: one line instead of nine
     { '<leader>1', desc = 'Harpoon: jump to file 1…9 (<leader>N)' },
