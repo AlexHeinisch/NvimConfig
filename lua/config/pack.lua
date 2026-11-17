@@ -95,29 +95,34 @@ vim.pack.add({
   gh 'm4xshen/hardtime.nvim',
 }, { load = true, confirm = false })
 
--- Plugin configuration, in load order (the colorscheme first; mason before the servers).
-for _, module in ipairs {
-  'tokyonight',
-  'which-key',
-  'mini',
-  'guess-indent',
+-- Plugin configuration. Everything that is needed for the first screen (colorscheme, statusline, treesitter,
+-- keymap triggers) runs now, in load order; the rest runs right after the first paint. That keeps startup at about
+-- the lazy.nvim level while the plugins are still ready before the first keypress (keys typed meanwhile are queued).
+local eager = { 'tokyonight', 'which-key', 'mini', 'guess-indent', 'gitsigns', 'nvim-treesitter', 'smart-splits', 'harpoon', 'lazydev', 'hardtime' }
+-- Order matters: blink registers the LSP capabilities that nvim-lspconfig's servers pick up.
+local deferred = {
   'todo-comments',
-  'gitsigns',
-  'nvim-treesitter',
   'treesitter-textobjects',
   'treesitter-context',
   'telescope',
   'neo-tree',
-  'smart-splits',
-  'harpoon',
   'trouble',
-  'lazydev',
   'blink',
   'nvim-lspconfig',
   'conform',
   'debug',
   'intellij-lsp',
-  'hardtime',
-} do
+}
+
+for _, module in ipairs(eager) do
   require('plugins.' .. module)
 end
+
+vim.schedule(function()
+  for _, module in ipairs(deferred) do
+    local ok, err = pcall(require, 'plugins.' .. module)
+    if not ok then
+      vim.notify('plugins.' .. module .. ': ' .. tostring(err), vim.log.levels.ERROR)
+    end
+  end
+end)
