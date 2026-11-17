@@ -11,7 +11,7 @@
 --   <leader>gh / gH   type hierarchy: subtypes / supertypes
 --   <leader>gc / gC   call hierarchy: incoming / outgoing
 --   <leader>dr        debug the main class at the cursor
---   <leader>db / dB   breakpoint / conditional breakpoint (kickstart debug.lua)
+--   <leader>db / dB   breakpoint / conditional breakpoint (debug.lua)
 --   <leader>dc dn di do dq de dw dv   continue, step over/into/out, stop, evaluate, watch, panel (plugin)
 return {
   'JetBrains/intellij-lsp.nvim',

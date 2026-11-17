@@ -44,3 +44,12 @@ vim.o.expandtab = true
 
 -- Autosave (see config/autocmds.lua) relies on this.
 vim.o.autowriteall = true
+
+vim.o.splitkeep = 'screen' -- keep text stable when splits open/close (Trouble, quickfix)
+vim.o.jumpoptions = 'view' -- restore the scroll position on <C-o> / <C-t>
+vim.o.pumheight = 10 -- max rows in the completion menu
+
+-- Treesitter folds, everything open by default (za / zc / zR / zM)
+vim.o.foldmethod = 'expr'
+vim.o.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
+vim.o.foldlevelstart = 99

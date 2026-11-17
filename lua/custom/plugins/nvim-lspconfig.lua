@@ -34,7 +34,7 @@ return {
   config = function()
     -- Runs when an LSP client attaches to a buffer: buffer-local maps and reference highlighting.
     vim.api.nvim_create_autocmd('LspAttach', {
-      group = vim.api.nvim_create_augroup('kickstart-lsp-attach', { clear = true }),
+      group = vim.api.nvim_create_augroup('custom-lsp-attach', { clear = true }),
       callback = function(event)
         local map = function(keys, func, desc, mode)
           vim.keymap.set(mode or 'n', keys, func, { buffer = event.buf, desc = 'LSP: ' .. desc })
@@ -62,7 +62,7 @@ return {
         -- Highlight references of the word under the cursor while it rests there (`:help CursorHold`).
         local client = vim.lsp.get_client_by_id(event.data.client_id)
         if client and client:supports_method('textDocument/documentHighlight', event.buf) then
-          local group = vim.api.nvim_create_augroup('kickstart-lsp-highlight-' .. event.buf, { clear = true })
+          local group = vim.api.nvim_create_augroup('custom-lsp-highlight-' .. event.buf, { clear = true })
           vim.api.nvim_create_autocmd({ 'CursorHold', 'CursorHoldI' }, {
             buffer = event.buf,
             group = group,
@@ -86,13 +86,13 @@ return {
     -- Clean up the per-buffer highlight group once. The group is per buffer, so attaching a second
     -- client or buffer never wipes another buffer's autocmds.
     vim.api.nvim_create_autocmd('LspDetach', {
-      group = vim.api.nvim_create_augroup('kickstart-lsp-detach', { clear = true }),
+      group = vim.api.nvim_create_augroup('custom-lsp-detach', { clear = true }),
       callback = function(event)
         if #vim.lsp.get_clients { bufnr = event.buf } > 1 then
           return -- other clients still attached; keep the highlight autocmds
         end
         vim.lsp.buf.clear_references()
-        pcall(vim.api.nvim_del_augroup_by_name, 'kickstart-lsp-highlight-' .. event.buf)
+        pcall(vim.api.nvim_del_augroup_by_name, 'custom-lsp-highlight-' .. event.buf)
       end,
     })
 
@@ -113,8 +113,16 @@ return {
     }
 
     -- Servers to install and enable; values are passed to `vim.lsp.config(name, cfg)`.
+    -- Java/Kotlin are served by intellij-lsp.nvim, so jdtls / kotlin-language-server are not listed.
     local servers = {
       lua_ls = {},
+      angularls = {},
+      docker_language_server = {}, -- Dockerfile and compose
+      fish_lsp = {},
+      helm_ls = {},
+      htmx = {},
+      lemminx = {}, -- XML
+      ts_ls = {},
     }
 
     -- Ensure the servers and tools above are installed (`:Mason` shows the state).
@@ -130,16 +138,8 @@ return {
       end
     end
 
-    -- mason-lspconfig v2 calls vim.lsp.enable() for every installed server.
-    require('mason-lspconfig').setup {
-      ensure_installed = {}, -- installs go through mason-tool-installer above
-      automatic_enable = {
-        exclude = {
-          'jdtls', -- Java/Kotlin is served by intellij-lsp.nvim
-          'pyright', -- not used; excluded in case it is still installed in Mason
-          'rust_analyzer',
-        },
-      },
-    }
+    -- Only the servers listed above are enabled (anything else installed in Mason stays off).
+    require('mason-lspconfig').setup { ensure_installed = {}, automatic_enable = false }
+    vim.lsp.enable(vim.tbl_keys(servers))
   end,
 }
