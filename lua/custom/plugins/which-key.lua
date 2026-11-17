@@ -52,7 +52,6 @@ return { -- Useful plugin to show you pending keybinds.
       -- Document existing key chains
       spec = {
         { '<leader>s', group = '[S]earch' },
-        { '<leader>a', group = '[A]gent (kitty)', mode = { 'n', 'x' } },
         { '<leader>l', group = '[L]anguage server control' },
         { '<leader>g', group = '[G]o to / code actions' },
         { '<leader>v', group = '[V]ersion control (neogit, diffview)' },
@@ -60,6 +59,16 @@ return { -- Useful plugin to show you pending keybinds.
         { '<leader>h', group = 'Git [H]unk (gitsigns)', mode = { 'n', 'v' } },
         { '<leader>d', group = '[D]ebug and test' },
         { '<leader>x', group = 'Trouble ([X])' },
+
+        -- Harpoon <leader>1..9: one line instead of nine
+        { '<leader>1', desc = 'Harpoon: jump to file 1…9 (<leader>N)' },
+        (function()
+          local hidden = {}
+          for i = 2, 9 do
+            table.insert(hidden, { '<leader>' .. i, hidden = true })
+          end
+          return hidden
+        end)(),
       },
     },
 }

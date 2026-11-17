@@ -5,10 +5,7 @@
 -- contains an executable named like one of `M.agents`. Windows in the current tab win;
 -- with several candidates you pick once and the choice is remembered.
 --
---   <leader>aa  (n) send `@file`             (v) send `@file#L10-20`
---   <leader>ad  send the diagnostics on the current line with their location
---   <leader>ap  type a prompt; sends `@file[#Lx-y] <prompt>` and submits it
---   <leader>af  focus the agent window
+-- No keymaps; used by `:KeymapReport!`. Public: send_ref, send_diagnostics, prompt, focus, send_text.
 local M = {}
 
 M.agents = { 'claude', 'pi' }
@@ -190,13 +187,6 @@ function M.send_text(text, opts)
   with_agent(function(agent)
     send(agent, text, opts)
   end)
-end
-
-function M.setup()
-  vim.keymap.set({ 'n', 'x' }, '<leader>aa', M.send_ref, { desc = '[A]gent: send file / selection reference' })
-  vim.keymap.set('n', '<leader>ad', M.send_diagnostics, { desc = '[A]gent: send line [D]iagnostics' })
-  vim.keymap.set({ 'n', 'x' }, '<leader>ap', M.prompt, { desc = '[A]gent: [P]rompt with file / selection' })
-  vim.keymap.set('n', '<leader>af', M.focus, { desc = '[A]gent: [F]ocus window' })
 end
 
 return M

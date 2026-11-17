@@ -116,9 +116,6 @@ vim.keymap.set('n', '<down>', '<cmd>echo "Use j to move!!"<CR>')
 -- Window navigation (<C-hjkl>, also across kitty windows) and resizing (<A-hjkl>)
 -- live in lua/custom/plugins/smart-splits.lua.
 
--- Send file / selection references to the coding agent in another kitty window (<leader>a...)
-require('custom.utils.kitty-agent').setup()
-
 -- [[ Basic Autocommands ]]
 --  See `:help lua-guide-autocommands`
 
@@ -244,6 +241,7 @@ require('lazy').setup({
   -- Navigation
   require 'kickstart.plugins.neo-tree',
   require 'custom.plugins.smart-splits',
+  require 'custom.plugins.harpoon',
 
   -- Habits: hints for inefficient motions (`:Hardtime report`)
   require 'custom.plugins.hardtime',

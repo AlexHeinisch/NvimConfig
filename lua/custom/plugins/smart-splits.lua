@@ -1,21 +1,13 @@
--- Seamless <C-hjkl> navigation (and <A-hjkl> resizing) across Neovim splits and kitty windows.
--- Requires the matching block in ~/.config/kitty/kitty.conf (see "smart-splits" there).
--- Not lazy: the kitty backend sets the IS_NVIM user var at startup, which kitty uses
--- to decide whether to pass <C-hjkl> through to Neovim.
+-- Seamless <C-hjkl> navigation (and <A-hjkl> resizing) across Neovim splits and herdr panes.
+-- The Neovim -> herdr direction is the backend in lua/custom/smart_splits_herdr.lua.
+-- The herdr -> Neovim direction is ~/.config/herdr/smart-nav.sh, bound in herdr's config.toml:
+-- it forwards the key to Neovim when Neovim is the focused pane, otherwise moves herdr focus.
 return {
   'smart-splits-nvim/smart-splits.nvim',
   version = '^3.0.0',
   lazy = false,
-  dependencies = {
-    {
-      'smart-splits-nvim/backend-kitty',
-      main = 'smart-splits-backend-kitty',
-      build = './kitten/install_relative_resize.lua', -- copies relative_resize.py to ~/.config/kitty
-      opts = {},
-    },
-  },
   opts = {
-    mux = { backend = 'smart-splits-backend-kitty' },
+    mux = { backend = 'custom.smart_splits_herdr' },
   },
   keys = {
     { '<C-h>', function() require('smart-splits').move_cursor_left() end, desc = 'Move to left window/pane' },

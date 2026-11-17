@@ -25,6 +25,7 @@ return { -- Highlight, edit, and navigate code
       'vim',
       'vimdoc',
       'java',
+      'python',
       -- Java project files: Maven/Spring config, Gradle, SQL
       'xml',
       'yaml',

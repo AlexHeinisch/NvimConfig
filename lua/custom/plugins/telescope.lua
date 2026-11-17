@@ -53,6 +53,10 @@ return { -- Fuzzy Finder (files, lsp, etc)
         --   },
         -- },
         -- pickers = {}
+        defaults = {
+          -- Drops src/main/java, elides the middle of long paths, dims dirs: iam/com/…/UserService.java
+          path_display = require('custom.utils.path-display').telescope,
+        },
         extensions = {
           ['ui-select'] = {
             require('telescope.themes').get_dropdown(),
