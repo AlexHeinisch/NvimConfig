@@ -6,6 +6,8 @@ require('mason').setup()
 -- Useful status updates for LSP.
 require('fidget').setup {
   notification = {
+    -- vim.notify as a popup instead of a multi-line message: Trouble's "No results" otherwise ends in a "Press ENTER" prompt.
+    override_vim_notify = true,
     window = {
       normal_hl = 'Normal', -- Use Normal highlight group (respects transparent background)
       winblend = 0, -- No blending, fully transparent background
