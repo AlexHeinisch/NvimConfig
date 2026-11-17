@@ -33,6 +33,8 @@ return {
     -- accept_eula = true, -- uncomment after reading EULA.txt to skip the prompt on new machines
   },
   config = function(_, opts)
+    -- debug panel: Locals and Watches above the Call stack
+    require('custom.utils.intellij-debug-layout').apply()
     require('intellij-lsp').setup(opts)
 
     vim.api.nvim_create_autocmd('LspAttach', {
@@ -76,12 +78,22 @@ return {
           end
 
           local editor = require 'intellij-lsp.editor'
-          map('<leader>gh', function() editor.type_hierarchy 'subtypes' end, 'LSP: Type [H]ierarchy (subtypes)')
-          map('<leader>gH', function() editor.type_hierarchy 'supertypes' end, 'LSP: Type [H]ierarchy (supertypes)')
-          map('<leader>gc', function() editor.call_hierarchy 'incoming' end, 'LSP: [C]all hierarchy (incoming)')
-          map('<leader>gC', function() editor.call_hierarchy 'outgoing' end, 'LSP: [C]all hierarchy (outgoing)')
+          map('<leader>gh', function()
+            editor.type_hierarchy 'subtypes'
+          end, 'LSP: Type [H]ierarchy (subtypes)')
+          map('<leader>gH', function()
+            editor.type_hierarchy 'supertypes'
+          end, 'LSP: Type [H]ierarchy (supertypes)')
+          map('<leader>gc', function()
+            editor.call_hierarchy 'incoming'
+          end, 'LSP: [C]all hierarchy (incoming)')
+          map('<leader>gC', function()
+            editor.call_hierarchy 'outgoing'
+          end, 'LSP: [C]all hierarchy (outgoing)')
 
-          map('<leader>dr', function() require('intellij-lsp.run').run_at_cursor(false) end, 'Debug: [R]un class at cursor')
+          map('<leader>dr', function()
+            require('intellij-lsp.run').run_at_cursor(false)
+          end, 'Debug: [R]un class at cursor')
 
           -- <leader>l: IntelliJ server commands (the :IntellijLsp* user commands)
           map('<leader>lr', '<Cmd>IntellijLspRestart<CR>', 'IntelliJ: [R]estart server')

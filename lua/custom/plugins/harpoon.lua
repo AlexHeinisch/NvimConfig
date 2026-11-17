@@ -30,12 +30,30 @@ return {
     end
     local menu_opts = { ui_width_ratio = 0.8, ui_max_width = 120, title = ' Harpoon ', title_pos = 'center', border = 'rounded' }
     local keys = {
-      { '<leader>m', function() list():add() end, desc = 'Harpoon: [M]ark file' },
-      { '<leader>M', function() require('harpoon').ui:toggle_quick_menu(list(), menu_opts) end, desc = 'Harpoon: [M]enu' },
+      {
+        '<leader>m',
+        function()
+          list():add()
+        end,
+        desc = 'Harpoon: [M]ark file',
+      },
+      {
+        '<leader>M',
+        function()
+          require('harpoon').ui:toggle_quick_menu(list(), menu_opts)
+        end,
+        desc = 'Harpoon: [M]enu',
+      },
     }
     -- which-key shows these as a single "1…9" line (see which-key.lua spec)
     for i = 1, 9 do
-      table.insert(keys, { '<leader>' .. i, function() list():select(i) end, desc = 'Harpoon: file ' .. i })
+      table.insert(keys, {
+        '<leader>' .. i,
+        function()
+          list():select(i)
+        end,
+        desc = 'Harpoon: file ' .. i,
+      })
     end
     return keys
   end,

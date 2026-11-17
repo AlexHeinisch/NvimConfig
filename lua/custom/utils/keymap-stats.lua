@@ -11,7 +11,7 @@
 --
 -- Commands:
 --   :KeymapReport      write a markdown report (most used, never used, raw keystrokes) and open it
---   :KeymapReport!     same, then send it to the coding agent in kitty and ask for advice
+--   :KeymapReport!     same, then copy a ready-made prompt (report reference + question) to the clipboard for a coding agent
 --   :KeymapStatsReset  delete all collected data
 -- See also `:Hardtime report` (hardtime.nvim) for repeated-motion habits.
 local M = {}
@@ -90,10 +90,7 @@ local function wrap_keymap_set()
   ---@diagnostic disable-next-line: duplicate-set-field
   vim.keymap.set = function(mode, lhs, rhs, opts)
     local desc = opts and opts.desc
-    local skip = not desc
-      or rhs == nil
-      or rhs == ''
-      or (type(rhs) == 'string' and (rhs:lower() == '<nop>' or opts.expr))
+    local skip = not desc or rhs == nil or rhs == '' or (type(rhs) == 'string' and (rhs:lower() == '<nop>' or opts.expr))
     if not skip then
       local id = mode_str(mode) .. ' ' .. lhs
       known[id] = desc
@@ -178,12 +175,7 @@ function M.report()
   local out = {
     '# Keymap usage report',
     '',
-    ('Tracking since %s. %d mappings used, %d defined but never used, %d normal-mode keystrokes.'):format(
-      fmt_time(data.since),
-      #used,
-      #unused,
-      total
-    ),
+    ('Tracking since %s. %d mappings used, %d defined but never used, %d normal-mode keystrokes.'):format(fmt_time(data.since), #used, #unused, total),
     '',
     'Mapping ids are `<modes> <lhs>`. `<leader>` is Space. See `:Hardtime report` for repeated-motion habits.',
     '',
@@ -221,7 +213,7 @@ end
 
 M.agent_prompt = table.concat({
   'This is a usage report of my Neovim keymaps and normal-mode keystrokes.',
-  'I mainly write Java (IntelliJ LSP), use kitty, and work alongside coding agents.',
+  'I mainly write Java (IntelliJ LSP), use herdr, and work alongside coding agents.',
   'My config is in ~/.config/nvim. Look at it and the report, then recommend:',
   '1) built-in motions/text objects that would replace my most frequent keystroke patterns,',
   '2) mappings I never use that could be removed or rebound,',
@@ -244,9 +236,12 @@ function M.setup()
     local path = M.report()
     vim.cmd.edit(vim.fn.fnameescape(path))
     if cmd.bang then
-      require('custom.utils.kitty-agent').send_text('@' .. path .. ' ' .. M.agent_prompt, { submit = true })
+      local prompt = '@' .. path .. ' ' .. M.agent_prompt
+      vim.fn.setreg('+', prompt)
+      vim.fn.setreg('"', prompt)
+      vim.notify 'Report prompt copied to the clipboard; paste it into your coding agent'
     end
-  end, { bang = true, desc = 'Keymap usage report (! = ask the coding agent for advice)' })
+  end, { bang = true, desc = 'Keymap usage report (! = also copy an agent prompt to the clipboard)' })
 
   vim.api.nvim_create_user_command('KeymapStatsReset', function()
     pending = { maps = {}, keys = {} }

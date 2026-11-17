@@ -8,7 +8,13 @@ return {
     trim_scope = 'outer',
   },
   keys = {
-    { '[C', function() require('treesitter-context').go_to_context(vim.v.count1) end, desc = 'Jump to [C]ontext (treesitter)' },
+    {
+      '[C',
+      function()
+        require('treesitter-context').go_to_context(vim.v.count1)
+      end,
+      desc = 'Jump to [C]ontext (treesitter)',
+    },
     { '<leader>tc', '<cmd>TSContext toggle<cr>', desc = '[T]oggle Treesitter [C]ontext' },
   },
 }

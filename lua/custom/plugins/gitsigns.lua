@@ -3,22 +3,22 @@ return {
   event = 'BufReadPre',
   opts = {
     signs = {
-      add          = { text = '│' },
-      change       = { text = '│' },
-      delete       = { text = '_' },
-      topdelete    = { text = '‾' },
+      add = { text = '│' },
+      change = { text = '│' },
+      delete = { text = '_' },
+      topdelete = { text = '‾' },
       changedelete = { text = '~' },
-      untracked    = { text = '┆' },
+      untracked = { text = '┆' },
     },
     -- Staged hunks use thicker/filled variants for clear visual distinction
     signs_staged_enable = true,
     signs_staged = {
-      add          = { text = '┃' },
-      change       = { text = '┃' },
-      delete       = { text = '▁' },
-      topdelete    = { text = '▔' },
+      add = { text = '┃' },
+      change = { text = '┃' },
+      delete = { text = '▁' },
+      topdelete = { text = '▔' },
       changedelete = { text = '▒' },
-      untracked    = { text = '┇' },
+      untracked = { text = '┇' },
     },
     on_attach = function(bufnr)
       local gs = package.loaded.gitsigns
@@ -30,12 +30,18 @@ return {
 
       -- Hunk navigation (respects diff mode)
       map('n', ']h', function()
-        if vim.wo.diff then vim.cmd.normal { ']c', bang = true }
-        else gs.nav_hunk 'next' end
+        if vim.wo.diff then
+          vim.cmd.normal { ']c', bang = true }
+        else
+          gs.nav_hunk 'next'
+        end
       end, { desc = 'Next [H]unk' })
       map('n', '[h', function()
-        if vim.wo.diff then vim.cmd.normal { '[c', bang = true }
-        else gs.nav_hunk 'prev' end
+        if vim.wo.diff then
+          vim.cmd.normal { '[c', bang = true }
+        else
+          gs.nav_hunk 'prev'
+        end
       end, { desc = 'Prev [H]unk' })
 
       -- Stage / unstage

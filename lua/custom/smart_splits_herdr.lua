@@ -18,13 +18,19 @@ end
 local function herdr(args)
   local cmd = { vim.env.HERDR_BIN_PATH or 'herdr' }
   vim.list_extend(cmd, args)
-  local ok, res = pcall(function() return vim.system(cmd, { text = true }):wait(1000) end)
-  if not ok or res.code ~= 0 then return nil end
+  local ok, res = pcall(function()
+    return vim.system(cmd, { text = true }):wait(1000)
+  end)
+  if not ok or res.code ~= 0 then
+    return nil
+  end
   local decoded_ok, json = pcall(vim.json.decode, res.stdout)
   return decoded_ok and type(json) == 'table' and json.result or nil
 end
 
-function M.detect() return pane_id() ~= nil end
+function M.detect()
+  return pane_id() ~= nil
+end
 
 function M.move(direction)
   local r = herdr { 'pane', 'focus', '--direction', direction, '--pane', pane_id() }

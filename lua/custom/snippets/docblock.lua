@@ -32,7 +32,9 @@ end
 local function make(tags_for)
   local function skeleton()
     local row = vim.api.nvim_win_get_cursor(0)[1] - 1
-    local ok, list = pcall(function() return tags_for(M.declaration_text(0, row)) end)
+    local ok, list = pcall(function()
+      return tags_for(M.declaration_text(0, row))
+    end)
     list = ok and list or {}
 
     -- ` * |`, a blank ` *` before the tags, then ` * @tag |` per tag
@@ -56,7 +58,9 @@ local MODULES = { java = 'custom.snippets.java', kotlin = 'custom.snippets.kotli
 
 --- `<CR>` after a lone `/**`: replace it with the doc comment skeleton. Returns true when it
 --- expanded, so a caller can fall through to the normal `<CR>` otherwise (see blink.lua).
-function M.expand_on_enter()
+--- With `defer`, the expansion runs on the next event-loop tick: blink.cmp runs its key commands in
+--- an `expr` mapping where the buffer text is locked (E565), so it cannot be changed synchronously.
+function M.expand_on_enter(defer)
   local module = MODULES[vim.bo.filetype]
   if not module then
     return false
@@ -66,10 +70,17 @@ function M.expand_on_enter()
   if col ~= #line or not line:match '^%s*/%*%*$' then
     return false
   end
-  local start = line:find('/%*%*$') - 1
-  ls.snip_expand(make(require(module).tags_for), {
-    clear_region = { from = { row - 1, start }, to = { row - 1, col } },
-  })
+  local start = line:find '/%*%*$' - 1
+  local function expand()
+    ls.snip_expand(make(require(module).tags_for), {
+      clear_region = { from = { row - 1, start }, to = { row - 1, col } },
+    })
+  end
+  if defer then
+    vim.schedule(expand)
+  else
+    expand()
+  end
   return true
 end
 
