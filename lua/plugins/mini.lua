@@ -56,6 +56,7 @@ statusline.config.content.active = function()
   }
 end
 require('mini.indentscope').setup()
-require('mini.surround').setup()
+-- No `n`/`l` suffix variants (srn, sdl, ...): they made `sr`, `sd`, `sf`, `sF` and `sh` wait for 'timeoutlen'.
+require('mini.surround').setup { mappings = { suffix_next = '', suffix_last = '' } }
 -- ... and there is more!
 --  Check out: https://github.com/echasnovski/mini.nvim
